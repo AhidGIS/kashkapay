@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ahid.kashkapay.dao;
+package com.ahid.kashkapay.services;
 
 /**
  *
  * @author cccc
  */
-public class SpecializationDao {
+public class ProtocolService {
     
 }

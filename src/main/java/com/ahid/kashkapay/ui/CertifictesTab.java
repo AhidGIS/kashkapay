@@ -8,6 +8,7 @@ package com.ahid.kashkapay.ui;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.HBox;
 
 /**

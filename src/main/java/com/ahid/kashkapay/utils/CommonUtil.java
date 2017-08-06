@@ -11,7 +11,7 @@ import java.util.UUID;
  *
  * @author cccc
  */
-public class CommonUtil {
+public final class CommonUtil {
     
     public static String uniqueString() {
         return UUID.randomUUID().toString();

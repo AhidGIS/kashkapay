@@ -1,6 +1,6 @@
 package com.ahid.kashkapay;
 
-import com.ahid.kashkapay.dao.LearnTypeDao;
+import com.ahid.kashkapay.services.LearnTypeService;
 import com.ahid.kashkapay.entities.LearnType;
 import com.ahid.kashkapay.utils.CommonUtil;
 import java.net.URL;
@@ -20,21 +20,21 @@ public class FXMLController implements Initializable {
     @FXML
     private void handleButtonAction(ActionEvent event) {
         System.out.println("You clicked me!");
-        label.setText(LearnTypeDao.getAll().stream().map(lt -> lt.getId() + ", " + lt.getName()).collect(Collectors.joining("\n")));
+        label.setText(LearnTypeService.getAll().stream().map(lt -> lt.getId() + ", " + lt.getName()).collect(Collectors.joining("\n")));
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        LearnTypeDao.getAll().forEach(lt -> {
+        LearnTypeService.getAll().forEach(lt -> {
             System.out.println(lt.getId() + ", " + lt.getName());
         });
         
         /*LearnType learnType = new LearnType();
         learnType.setId(CommonUtil.uniqueString());
         learnType.setName("Обучение");
-        LearnTypeDao.create(learnType);*/
+        LearnTypeService.create(learnType);*/
         
-        LearnTypeDao.getAll().forEach(lt -> {
+        LearnTypeService.getAll().forEach(lt -> {
             System.out.println(lt.getId() + ", " + lt.getName());
         });
     }    

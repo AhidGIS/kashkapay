@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ahid.kashkapay.dao;
+package com.ahid.kashkapay.services;
 
 import com.ahid.kashkapay.entities.LearnType;
 import java.util.List;
@@ -15,7 +15,7 @@ import javax.persistence.Query;
  *
  * @author cccc
  */
-public class LearnTypeDao {
+public class LearnTypeService {
     
     public static List<LearnType> getAll() {
         Query query = EntityManagerFactoryHolder.createEntityManager().createNamedQuery("LearnType.findAll");

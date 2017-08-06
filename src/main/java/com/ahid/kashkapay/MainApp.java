@@ -1,6 +1,6 @@
 package com.ahid.kashkapay;
 
-import com.ahid.kashkapay.dao.EntityManagerFactoryHolder;
+import com.ahid.kashkapay.services.EntityManagerFactoryHolder;
 import com.ahid.kashkapay.ui.CertifictesTab;
 import com.ahid.kashkapay.ui.ProtocolsTab;
 import com.ahid.kashkapay.ui.ReferenceDataTab;
@@ -46,8 +46,8 @@ public class MainApp extends Application {
 
         primaryStage.setTitle("Kashkapay");
         primaryStage.setMaximized(true);
-        primaryStage.setMinHeight(400);
-        primaryStage.setMinWidth(800);
+        primaryStage.setMinHeight(500);
+        primaryStage.setMinWidth(1000);
         
         Group root = new Group();
         Scene scene = new Scene(root);
@@ -57,6 +57,7 @@ public class MainApp extends Application {
         borderPane.prefWidthProperty().bind(scene.widthProperty());
         
         TabPane tabPane = new TabPane();
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         borderPane.setCenter(tabPane);
         
         Tab referencesTab = new ReferenceDataTab(primaryStage);
