@@ -1,21 +1,27 @@
 package com.ahid.kashkapay;
 
 import com.ahid.kashkapay.dao.EntityManagerFactoryHolder;
-import java.io.File;
+import com.ahid.kashkapay.ui.CertifictesTab;
+import com.ahid.kashkapay.ui.ProtocolsTab;
+import com.ahid.kashkapay.ui.ReferenceDataTab;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-
 public class MainApp extends Application {
-    
+
     private static String[] arguments;
-    
+
     private void initDB() {
         Map props = new HashMap();
         String pathToDbFile = arguments.length == 0 ? "data.db" : arguments[0];
@@ -25,28 +31,47 @@ public class MainApp extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
-        
+    public void start(Stage primaryStage) throws Exception {
+
         this.initDB();
+//        
+//        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
+//        
+//        Scene scene = new Scene(root);
+//        scene.getStylesheets().add("/styles/Styles.css");
+//        
+//        stage.setTitle("JavaFX and Maven");
+//        stage.setScene(scene);
+//        stage.show();
+
+        primaryStage.setTitle("Kashkapay");
+        primaryStage.setMaximized(true);
+        primaryStage.setMinHeight(400);
+        primaryStage.setMinWidth(800);
         
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
-        
+        Group root = new Group();
         Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
         
-        stage.setTitle("JavaFX and Maven");
-        stage.setScene(scene);
-        stage.show();
+        BorderPane borderPane = new BorderPane();
+        borderPane.prefHeightProperty().bind(scene.heightProperty());
+        borderPane.prefWidthProperty().bind(scene.widthProperty());
+        
+        TabPane tabPane = new TabPane();
+        borderPane.setCenter(tabPane);
+        
+        Tab referencesTab = new ReferenceDataTab(primaryStage);
+        Tab protocolsTab = new ProtocolsTab();
+        Tab certificatesTab = new CertifictesTab();
+        
+        tabPane.getTabs().add(referencesTab);
+        tabPane.getTabs().add(protocolsTab);
+        tabPane.getTabs().add(certificatesTab);
+
+        root.getChildren().add(borderPane);
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
-    /**
-     * The main() method is ignored in correctly deployed JavaFX application.
-     * main() serves only as fallback in case the application can not be
-     * launched through deployment artifacts, e.g., in IDEs with limited FX
-     * support. NetBeans ignores main().
-     *
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         arguments = args;
         launch(args);
@@ -57,5 +82,4 @@ public class MainApp extends Application {
         EntityManagerFactoryHolder.destroy();
     }
 
-    
 }
