@@ -4,18 +4,16 @@ import com.ahid.kashkapay.services.EntityManagerFactoryHolder;
 import com.ahid.kashkapay.ui.CertifictesTab;
 import com.ahid.kashkapay.ui.ProtocolsTab;
 import com.ahid.kashkapay.ui.ReferenceDataTab;
+import static com.ahid.kashkapay.utils.UIUtil.getMainIcon;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class MainApp extends Application {
@@ -48,6 +46,7 @@ public class MainApp extends Application {
         primaryStage.setMaximized(true);
         primaryStage.setMinHeight(500);
         primaryStage.setMinWidth(1000);
+        primaryStage.getIcons().add(getMainIcon());
         
         Group root = new Group();
         Scene scene = new Scene(root);

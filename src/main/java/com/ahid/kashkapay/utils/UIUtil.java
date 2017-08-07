@@ -9,6 +9,8 @@ import java.util.Optional;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 
 /**
  *
@@ -26,8 +28,9 @@ public final class UIUtil {
         Alert alert = new Alert(alertType);
         alert.setTitle("");
         alert.setHeaderText(title);
-        //alert.setContentText(content);
         alert.getDialogPane().setContentText(content);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(getMainIcon());
         return alert.showAndWait();
     }
 
@@ -45,5 +48,25 @@ public final class UIUtil {
 
     public static Optional<ButtonType> showConfirmation(String content) {
         return showAlert(AlertType.CONFIRMATION, "Диалог подтверждения", content);
+    }
+    
+    public static Image getIconByName(String name) {
+        return new Image("/icons/" + name);
+    }
+    
+    public static Image getMainIcon() {
+        return getIconByName("logo.png");
+    }
+    
+    public static Image getMenuItemEditIcon() {
+        return getIconByName("edit.png");
+    }
+    
+    public static Image getMenuItemAddIcon() {
+        return getIconByName("add.png");
+    }
+    
+    public static Image getMenuItemDeleteIcon() {
+        return getIconByName("delete.png");
     }
 }

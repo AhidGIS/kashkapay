@@ -17,6 +17,9 @@ import com.ahid.kashkapay.ui.models.LearnTypeModel;
 import com.ahid.kashkapay.ui.models.OrganizationModel;
 import com.ahid.kashkapay.ui.models.SpecializationModel;
 import static com.ahid.kashkapay.utils.UIUtil.getCustomStyleForRootViews;
+import static com.ahid.kashkapay.utils.UIUtil.getMenuItemAddIcon;
+import static com.ahid.kashkapay.utils.UIUtil.getMenuItemDeleteIcon;
+import static com.ahid.kashkapay.utils.UIUtil.getMenuItemEditIcon;
 import static com.ahid.kashkapay.utils.UIUtil.showConfirmation;
 import static com.ahid.kashkapay.utils.UIUtil.showError;
 import static com.ahid.kashkapay.utils.UIUtil.showInfo;
@@ -36,6 +39,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -393,6 +397,7 @@ public class ReferenceDataTab extends Tab {
     private ContextMenu createLearnTypeContextMenu() {
         ContextMenu cm = new ContextMenu();
         MenuItem addItem = new MenuItem("Добавить");
+        addItem.setGraphic(new ImageView(getMenuItemAddIcon()));
         addItem.setOnAction(event -> {
             this.learnType = new LearnType();
             this.learnType.setName("");
@@ -400,6 +405,7 @@ public class ReferenceDataTab extends Tab {
         });
         cm.getItems().add(addItem);
         MenuItem editItem = new MenuItem("Редактировать");
+        editItem.setGraphic(new ImageView(getMenuItemEditIcon()));
         editItem.setOnAction(event -> {
             LearnTypeModel model = (LearnTypeModel) this.learnTypesTable.getSelectionModel().getSelectedItem();
             this.learnType = model.toLearnType();
@@ -408,6 +414,7 @@ public class ReferenceDataTab extends Tab {
         });
         cm.getItems().add(editItem);
         MenuItem removeItem = new MenuItem("Удалить");
+        removeItem.setGraphic(new ImageView(getMenuItemDeleteIcon()));
         removeItem.setOnAction(event -> {
             try {
                 cancelLearnTypeSave();
@@ -428,6 +435,7 @@ public class ReferenceDataTab extends Tab {
     private ContextMenu createSpecializationContextMenu() {
         ContextMenu cm = new ContextMenu();
         MenuItem addItem = new MenuItem("Добавить");
+        addItem.setGraphic(new ImageView(getMenuItemAddIcon()));
         addItem.setOnAction(event -> {
             this.specialization = new Specialization();
             this.specialization.setName("");
@@ -435,6 +443,7 @@ public class ReferenceDataTab extends Tab {
         });
         cm.getItems().add(addItem);
         MenuItem editItem = new MenuItem("Редактировать");
+        editItem.setGraphic(new ImageView(getMenuItemEditIcon()));
         editItem.setOnAction(event -> {
             SpecializationModel model = (SpecializationModel) this.specializationsTable.getSelectionModel().getSelectedItem();
             this.specialization = model.toSpecialization();
@@ -443,6 +452,7 @@ public class ReferenceDataTab extends Tab {
         });
         cm.getItems().add(editItem);
         MenuItem removeItem = new MenuItem("Удалить");
+        removeItem.setGraphic(new ImageView(getMenuItemDeleteIcon()));
         removeItem.setOnAction(event -> {
                 cancelSpecializationSave();
             try {
@@ -463,6 +473,7 @@ public class ReferenceDataTab extends Tab {
     private ContextMenu createOrganizationContextMenu() {
         ContextMenu cm = new ContextMenu();
         MenuItem addItem = new MenuItem("Добавить");
+        addItem.setGraphic(new ImageView(getMenuItemAddIcon()));
         addItem.setOnAction(event -> {
             this.organization = new Organization();
             this.organization.setName("");
@@ -470,6 +481,7 @@ public class ReferenceDataTab extends Tab {
         });
         cm.getItems().add(addItem);
         MenuItem editItem = new MenuItem("Редактировать");
+        editItem.setGraphic(new ImageView(getMenuItemEditIcon()));
         editItem.setOnAction(event -> {
             OrganizationModel model = (OrganizationModel) this.organizationsTable.getSelectionModel().getSelectedItem();
             this.organization = model.toOrganization();
@@ -478,6 +490,7 @@ public class ReferenceDataTab extends Tab {
         });
         cm.getItems().add(editItem);
         MenuItem removeItem = new MenuItem("Удалить");
+        removeItem.setGraphic(new ImageView(getMenuItemDeleteIcon()));
         removeItem.setOnAction(event -> {
             try {
                 cancelOrganizationSave();
