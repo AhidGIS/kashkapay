@@ -256,7 +256,7 @@ public class ReferenceDataTab extends Tab {
                     LearnTypeService.save(learnType);
                     cancelLearnTypeSave();
                     fillLearnTypesTable();
-                    showInfo("Вид обучения успешно сохранено");
+                    showInfo("Вид обучения успешно сохранен");
                 }
             } catch (DuplicateException de) {
                 showError(de.getMessage());
@@ -282,7 +282,28 @@ public class ReferenceDataTab extends Tab {
         specializationNameTextEdit = new TextField();
         specializationNameTextEdit.setPromptText("Введите наименование");
         specializationSaveButton = new Button("Сохранить");
+        specializationSaveButton.setOnAction(event -> {
+            try {
+                if (specialization.getName().equals(specializationNameTextEdit.getText().trim())) {
+                    showWarning("Изменения не обнаружены");
+                    return;
+                }
+
+                if (showConfirmation("Вы подтверждаете сохранение специальности?").get() == ButtonType.OK) {
+                    specialization.setName(specializationNameTextEdit.getText().trim());
+                    SpecializationService.save(specialization);
+                    cancelSpecializationSave();
+                    fillSpecializationsTable();
+                    showInfo("Специальность успешно сохранена");
+                }
+            } catch (DuplicateException de) {
+                showError(de.getMessage());
+            }
+        });
         specializationCancelButton = new Button("Отменить");
+        specializationCancelButton.setOnAction(event -> {
+            cancelSpecializationSave();
+        });
         HBox hb = new HBox();
         hb.setSpacing(10);
         hb.getChildren().addAll(specializationSaveButton, specializationCancelButton);
@@ -299,7 +320,28 @@ public class ReferenceDataTab extends Tab {
         organizationNameTextEdit = new TextField();
         organizationNameTextEdit.setPromptText("Введите наименование");
         organizationSaveButton = new Button("Сохранить");
+        organizationSaveButton.setOnAction(event -> {
+            try {
+                if (organization.getName().equals(organizationNameTextEdit.getText().trim())) {
+                    showWarning("Изменения не обнаружены");
+                    return;
+                }
+
+                if (showConfirmation("Вы подтверждаете сохранение организации?").get() == ButtonType.OK) {
+                    organization.setName(organizationNameTextEdit.getText().trim());
+                    OrganizationService.save(organization);
+                    cancelOrganizationSave();
+                    fillOrganizationsTable();
+                    showInfo("Организация успешно сохранена");
+                }
+            } catch (DuplicateException de) {
+                showError(de.getMessage());
+            }
+        });
         organizationCancelButton = new Button("Отменить");
+        organizationCancelButton.setOnAction(event -> {
+            cancelOrganizationSave();
+        });
         HBox hb = new HBox();
         hb.setSpacing(10);
         hb.getChildren().addAll(organizationSaveButton, organizationCancelButton);
@@ -368,6 +410,7 @@ public class ReferenceDataTab extends Tab {
         MenuItem removeItem = new MenuItem("Удалить");
         removeItem.setOnAction(event -> {
             try {
+                cancelLearnTypeSave();
                 if (showConfirmation("Вы подтверждаете удаление вида обучения?").get() == ButtonType.OK) {
                     LearnTypeModel ltm = (LearnTypeModel) this.learnTypesTable.getSelectionModel().getSelectedItem();
                     LearnTypeService.delete(ltm.toLearnType());
@@ -386,17 +429,32 @@ public class ReferenceDataTab extends Tab {
         ContextMenu cm = new ContextMenu();
         MenuItem addItem = new MenuItem("Добавить");
         addItem.setOnAction(event -> {
-
+            this.specialization = new Specialization();
+            this.specialization.setName("");
+            this.setActiveSpecializationEditors();
         });
         cm.getItems().add(addItem);
         MenuItem editItem = new MenuItem("Редактировать");
         editItem.setOnAction(event -> {
-
+            SpecializationModel model = (SpecializationModel) this.specializationsTable.getSelectionModel().getSelectedItem();
+            this.specialization = model.toSpecialization();
+            this.specializationNameTextEdit.setText(this.specialization.getName());
+            this.setActiveSpecializationEditors();
         });
         cm.getItems().add(editItem);
         MenuItem removeItem = new MenuItem("Удалить");
         removeItem.setOnAction(event -> {
-
+                cancelSpecializationSave();
+            try {
+                if (showConfirmation("Вы подтверждаете удаление специальности?").get() == ButtonType.OK) {
+                    SpecializationModel model = (SpecializationModel) this.specializationsTable.getSelectionModel().getSelectedItem();
+                    SpecializationService.delete(model.toSpecialization());
+                    specializationsTable.getItems().remove(model);
+                    showInfo("Специальность успешно удалена");
+                }
+            } catch (ReferencesExistsException ex) {
+                showError(ex.getMessage());
+            }
         });
         cm.getItems().add(removeItem);
         return cm;
@@ -406,17 +464,32 @@ public class ReferenceDataTab extends Tab {
         ContextMenu cm = new ContextMenu();
         MenuItem addItem = new MenuItem("Добавить");
         addItem.setOnAction(event -> {
-
+            this.organization = new Organization();
+            this.organization.setName("");
+            this.setActiveOrganizationEditors();
         });
         cm.getItems().add(addItem);
         MenuItem editItem = new MenuItem("Редактировать");
         editItem.setOnAction(event -> {
-
+            OrganizationModel model = (OrganizationModel) this.organizationsTable.getSelectionModel().getSelectedItem();
+            this.organization = model.toOrganization();
+            this.organizationNameTextEdit.setText(this.organization.getName());
+            this.setActiveOrganizationEditors();
         });
         cm.getItems().add(editItem);
         MenuItem removeItem = new MenuItem("Удалить");
         removeItem.setOnAction(event -> {
-
+            try {
+                cancelOrganizationSave();
+                if (showConfirmation("Вы подтверждаете удаление организации?").get() == ButtonType.OK) {
+                    OrganizationModel model = (OrganizationModel) this.organizationsTable.getSelectionModel().getSelectedItem();
+                    OrganizationService.delete(model.toOrganization());
+                    organizationsTable.getItems().remove(model);
+                    showInfo("Организация успешно удалена");
+                }
+            } catch (ReferencesExistsException ex) {
+                showError(ex.getMessage());
+            }
         });
         cm.getItems().add(removeItem);
         return cm;
@@ -426,5 +499,17 @@ public class ReferenceDataTab extends Tab {
         this.learnType = null;
         this.learnTypeNameTextEdit.clear();
         this.setInactiveLearnTypeEditors();
+    }
+
+    private void cancelSpecializationSave() {
+        this.specialization = null;
+        this.specializationNameTextEdit.clear();
+        this.setInactiveSpecializationEditors();
+    }
+
+    private void cancelOrganizationSave() {
+        this.organization = null;
+        this.organizationNameTextEdit.clear();
+        this.setInactiveOrganizationEditors();
     }
 }

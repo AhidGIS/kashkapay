@@ -30,7 +30,7 @@ public class LearnTypeService {
             int existedCount = Integer.parseInt(EntityManagerFactoryHolder.createEntityManager()
                     .createNamedQuery("LearnType.existedCountByName").setParameter("name", lt.getName()).getSingleResult().toString());
             if (existedCount > 0) {
-                throw new DuplicateException("Вид обучения уже существует. Нельзя дублировать");
+                throw new DuplicateException("Вид обучения уже существует.  \nНельзя дублировать");
             }
             lt.setId(uniqueString());
         } else {
@@ -38,7 +38,7 @@ public class LearnTypeService {
                     .createNamedQuery("LearnType.existedCountByNotIdAndName").setParameter("id", lt.getId()).
                     setParameter("name", lt.getName()).getSingleResult().toString());
             if (existedCount > 0) {
-                throw new DuplicateException("Вид обучения уже существует. Нельзя дублировать");
+                throw new DuplicateException("Вид обучения уже существует.  \nНельзя дублировать");
             }
         }
 
@@ -49,7 +49,7 @@ public class LearnTypeService {
         int existedCount = Integer.parseInt(EntityManagerFactoryHolder.createEntityManager()
                 .createNamedQuery("Protocol.countByLearnType").setParameter("id", lt.getId()).getSingleResult().toString());
         if (existedCount > 0) {
-            throw new ReferencesExistsException("Невозможно удалить вид обучения. Есть зависимые данные в таблице Протокола");
+            throw new ReferencesExistsException("Невозможно удалить вид обучения. \nЕсть зависимые данные в таблице Протокола");
         }
         remove(lt);
     }

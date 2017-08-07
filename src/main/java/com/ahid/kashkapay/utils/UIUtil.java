@@ -22,12 +22,13 @@ public final class UIUtil {
                 + "-fx-border-width: 3;\n";
     }
 
-    public static void showAlert(AlertType alertType, String title, String content) {
+    public static Optional<ButtonType> showAlert(AlertType alertType, String title, String content) {
         Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        alert.setTitle("");
+        alert.setHeaderText(title);
+        //alert.setContentText(content);
+        alert.getDialogPane().setContentText(content);
+        return alert.showAndWait();
     }
 
     public static void showError(String content) {
@@ -43,11 +44,6 @@ public final class UIUtil {
     }
 
     public static Optional<ButtonType> showConfirmation(String content) {
-        Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle("Диалог пожтверждения");
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-
-        return alert.showAndWait();
+        return showAlert(AlertType.CONFIRMATION, "Диалог подтверждения", content);
     }
 }

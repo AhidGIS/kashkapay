@@ -26,6 +26,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Organization.findAll", query = "SELECT o FROM Organization o")
+    , @NamedQuery(name = "Organization.existedCountByName", query = "SELECT count(o.id) FROM Organization o WHERE o.name = :name")
+    , @NamedQuery(name = "Organization.existedCountByNotIdAndName", query = "SELECT count(o.id) FROM Organization o WHERE o.id != :id and o.name = :name")
     , @NamedQuery(name = "Organization.findById", query = "SELECT o FROM Organization o WHERE o.id = :id")
     , @NamedQuery(name = "Organization.findByName", query = "SELECT o FROM Organization o WHERE o.name = :name")})
 public class Organization implements Serializable {
