@@ -5,8 +5,10 @@
  */
 package com.ahid.kashkapay.utils;
 
+import java.util.Optional;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 
 /**
  *
@@ -28,4 +30,24 @@ public final class UIUtil {
         alert.showAndWait();
     }
 
+    public static void showError(String content) {
+        showAlert(AlertType.ERROR, "Ошибка", content);
+    }
+
+    public static void showWarning(String content) {
+        showAlert(AlertType.WARNING, "Предупреждение", content);
+    }
+
+    public static void showInfo(String content) {
+        showAlert(AlertType.INFORMATION, "Информация", content);
+    }
+
+    public static Optional<ButtonType> showConfirmation(String content) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Диалог пожтверждения");
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+
+        return alert.showAndWait();
+    }
 }

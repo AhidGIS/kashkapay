@@ -5,6 +5,8 @@
  */
 package com.ahid.kashkapay.ui.models;
 
+import com.ahid.kashkapay.entities.LearnType;
+import com.ahid.kashkapay.entities.Organization;
 import java.util.Objects;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -68,4 +70,14 @@ public class OrganizationModel {
     }
 
     
+    public Organization toOrganization() {
+        Organization org = new Organization();
+        org.setId(this.getId());
+        org.setName(this.getName());
+        return org;
+    }
+     
+    public static OrganizationModel fromOrganization(Organization org) {
+        return new OrganizationModel(org.getId(), org.getName());
+    }
 }

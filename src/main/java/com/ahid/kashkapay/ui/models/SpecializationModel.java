@@ -5,6 +5,8 @@
  */
 package com.ahid.kashkapay.ui.models;
 
+import com.ahid.kashkapay.entities.Organization;
+import com.ahid.kashkapay.entities.Specialization;
 import java.util.Objects;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -68,4 +70,14 @@ public class SpecializationModel {
     }
 
     
+    public Specialization toSpecialization() {
+        Specialization spec = new Specialization();
+        spec.setId(this.getId());
+        spec.setName(this.getName());
+        return spec;
+    }
+ 
+    public static SpecializationModel fromSpecialization(Specialization spec) {
+        return new SpecializationModel(spec.getId(), spec.getName());
+    }   
 }

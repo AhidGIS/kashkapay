@@ -5,6 +5,7 @@
  */
 package com.ahid.kashkapay.ui.models;
 
+import com.ahid.kashkapay.entities.LearnType;
 import java.util.Objects;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -66,5 +67,15 @@ public class LearnTypeModel {
         }
         return true;
     }
-        
+    
+    public LearnType toLearnType() {
+        LearnType lt = new LearnType();
+        lt.setId(this.getId());
+        lt.setName(this.getName());
+        return lt;
+    }
+     
+    public static LearnTypeModel fromLearnType(LearnType lt) {
+        return new LearnTypeModel(lt.getId(), lt.getName());
+    }
 }
