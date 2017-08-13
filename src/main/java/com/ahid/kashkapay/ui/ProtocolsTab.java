@@ -55,6 +55,14 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.util.Callback;
 import static com.ahid.kashkapay.utils.CommonUtil.getDBDateFormat;
 import static com.ahid.kashkapay.utils.CommonUtil.getUIDateFormat;
+import java.util.HashMap;
+import java.util.Map;
+import javafx.event.EventHandler;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 /**
  *
@@ -63,6 +71,9 @@ import static com.ahid.kashkapay.utils.CommonUtil.getUIDateFormat;
 public class ProtocolsTab extends Tab {
 
     private Protocol protocolForOperate;
+
+    private Map<String, String> filters;
+
     private ObservableList<LearnType> learnTypes;
     private ObservableList<Organization> organizations;
     private ObservableList<Specialization> specializations;
@@ -79,8 +90,13 @@ public class ProtocolsTab extends Tab {
     private ComboBox cbSpecialization;
     private DatePicker dpProtocolDate;
 
+    private Button filterBtn;
+    private Button resetFiltersBtn;
+    private TextField tfCurrentYear;
+
     public ProtocolsTab(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        this.filters = new HashMap<>();
         this.initUI();
     }
 
@@ -108,7 +124,7 @@ public class ProtocolsTab extends Tab {
         viewContent.setOrientation(Orientation.VERTICAL);
         new Thread(() -> {
             Platform.runLater(() -> {
-                viewContent.setDividerPositions(0.20f, 0.80f);
+                viewContent.setDividerPositions(0.1f, 0.9f);
             });
         }).start();
         return viewContent;
@@ -275,7 +291,56 @@ public class ProtocolsTab extends Tab {
     }
 
     private Pane initAndGetFilterContent() {
-        return new HBox();
+        HBox filtersHb = new HBox();
+        filtersHb.setPadding(new Insets(10, 10, 10, 10));
+        filtersHb.setSpacing(10);
+
+        String currentYear = String.valueOf(LocalDate.now().getYear());
+        this.filters.put("current_year", currentYear);
+        this.tfCurrentYear = new TextField(currentYear);
+        this.tfCurrentYear.setTooltip(new Tooltip("Для смены года нажмите дважды. Потом для завершения нажмите Enter"));
+        this.tfCurrentYear.setPrefWidth(50);
+        this.disableCurrentYear();
+        this.tfCurrentYear.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+                    if (mouseEvent.getClickCount() == 2) {
+                        tfCurrentYear.setEditable(true);
+                    }
+                }
+            }
+        });
+        this.tfCurrentYear.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent ke) {
+                if (ke.getCode().equals(KeyCode.ENTER)) {
+                    disableCurrentYear();
+                }
+            }
+        });
+        this.tfCurrentYear.setStyle("-fx-background-color: green;");
+
+        this.resetFiltersBtn = new Button("Сбросить фильтры");
+        this.resetFiltersBtn.setOnAction(e -> {
+            filters = new HashMap<>();
+            String currYear = String.valueOf(LocalDate.now().getYear());
+            filters.put("current_year", currYear);
+            tfCurrentYear.setText(currYear);
+            //clear inputs later
+            fillProtocolsTable();
+            disableCurrentYear();
+        });
+
+        this.filterBtn = new Button("Фильтр");
+        this.filterBtn.setOnAction(e -> {
+            filters.put("current_year", tfCurrentYear.getText());
+            fillProtocolsTable();
+            disableCurrentYear();
+        });
+
+        filtersHb.getChildren().addAll(this.tfCurrentYear, this.resetFiltersBtn, this.filterBtn);
+        return filtersHb;
     }
 
     private TableView initAndGetTableContent() {
@@ -349,8 +414,13 @@ public class ProtocolsTab extends Tab {
     }
 
     void fillProtocolsTable() {
-        this.protocolsTable.setItems(FXCollections.observableArrayList(ProtocolService.getAll()
-                .stream().map(protocol -> ProtocolModel.fromProtocol(protocol)).collect(Collectors.toList())));
+        if (this.filters.isEmpty()) {
+            this.protocolsTable.setItems(FXCollections.observableArrayList(ProtocolService.getAll()
+                    .stream().map(protocol -> ProtocolModel.fromProtocol(protocol)).collect(Collectors.toList())));
+        } else {
+            this.protocolsTable.setItems(FXCollections.observableArrayList(ProtocolService.getFiltered(this.filters)
+                    .stream().map(protocol -> ProtocolModel.fromProtocol(protocol)).collect(Collectors.toList())));
+        }
     }
 
     private ContextMenu createContextMenu() {
@@ -460,5 +530,9 @@ public class ProtocolsTab extends Tab {
                 && this.protocolForOperate.getProtocolDate() != null && !"".equals(this.protocolForOperate.getProtocolDate())) {
             this.saveBtn.setDisable(false);
         }
+    }
+
+    public void disableCurrentYear() {
+        tfCurrentYear.setEditable(false);
     }
 }

@@ -11,6 +11,7 @@ import com.ahid.kashkapay.exceptions.DuplicateException;
 import com.ahid.kashkapay.exceptions.ReferencesExistsException;
 import static com.ahid.kashkapay.utils.CommonUtil.uniqueString;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
@@ -20,13 +21,19 @@ import javax.persistence.Query;
  * @author cccc
  */
 public class ProtocolService {
-    
+
     public static List<Protocol> getAll() {
         Query query = EntityManagerFactoryHolder.createEntityManager().createNamedQuery("Protocol.findAll");
         return query.getResultList();
     }
-    
-    
+
+    public static List<Protocol> getFiltered(Map<String, String> filters) {
+        Query query = EntityManagerFactoryHolder.createEntityManager()
+                .createNativeQuery("select * from protocols p where strftime('%Y', p.protocol_date) = '" + 
+                        filters.get("current_year") + "'", Protocol.class);
+        return (List<Protocol>) query.getResultList();
+    }
+
     public static void save(Protocol protocol) throws DuplicateException {
         if (protocol.getId() == null) {
             int existedCount = Integer.parseInt(EntityManagerFactoryHolder.createEntityManager()
@@ -50,7 +57,7 @@ public class ProtocolService {
 
         persist(protocol);
     }
-    
+
     private static void persist(Protocol protocol) {
         EntityManager em = EntityManagerFactoryHolder.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -58,7 +65,7 @@ public class ProtocolService {
         em.merge(protocol);
         tx.commit();
     }
-    
+
     public static void delete(Protocol protocol) throws ReferencesExistsException {
         int existedCount = Integer.parseInt(EntityManagerFactoryHolder.createEntityManager()
                 .createNamedQuery("Certificate.countByProtocol").setParameter("id", protocol.getId()).getSingleResult().toString());

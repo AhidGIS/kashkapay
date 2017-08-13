@@ -71,6 +71,7 @@ public class MainApp extends Application {
             if (oldTab.getClass().equals(ProtocolsTab.class) && !newTab.getClass().equals(ProtocolsTab.class)) {
                 ProtocolsTab pt = (ProtocolsTab) oldTab;
                 pt.setInactiveEditorView();
+                pt.disableCurrentYear();
             }
         });
 
