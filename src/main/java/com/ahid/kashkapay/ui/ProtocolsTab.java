@@ -51,8 +51,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import javafx.util.converter.LocalDateStringConverter;
-import static com.ahid.kashkapay.utils.CommonUtil.getCommonDateFormat;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.util.Callback;
+import static com.ahid.kashkapay.utils.CommonUtil.getDBDateFormat;
+import static com.ahid.kashkapay.utils.CommonUtil.getUIDateFormat;
 
 /**
  *
@@ -196,7 +198,7 @@ public class ProtocolsTab extends Tab {
         this.dpProtocolDate = new DatePicker();
         this.dpProtocolDate.valueProperty().addListener((observable, oldValue, newValue) -> {
             if ((newValue == null || !newValue.equals(oldValue)) && protocolForOperate != null) {
-                protocolForOperate.setProtocolDate(newValue.format(DateTimeFormatter.ofPattern(getCommonDateFormat())));
+                protocolForOperate.setProtocolDate(newValue.format(DateTimeFormatter.ofPattern(getDBDateFormat())));
                 validate();
             }
         });
@@ -323,9 +325,18 @@ public class ProtocolsTab extends Tab {
         specName.setResizable(true);
 
         TableColumn protocolDate = new TableColumn("Дата протокола");
-        protocolDate.setCellValueFactory(
-                new PropertyValueFactory<ProtocolModel, String>("protocolDate"));
+//        protocolDate.setCellValueFactory(
+//                new PropertyValueFactory<ProtocolModel, String>("protocolDate"));
         protocolDate.setResizable(true);
+        protocolDate.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ProtocolModel, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures cdf) {
+                SimpleStringProperty property = new SimpleStringProperty();
+                LocalDate ld = LocalDate.parse(((ProtocolModel) cdf.getValue()).getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()));
+                property.setValue(ld.format(DateTimeFormatter.ofPattern(getUIDateFormat())));
+                return property;
+            }
+        });
 
         this.protocolsTable.getColumns().addAll(idCol, protocolNumber, protocolOwner, orgId, orgName,
                 learnTypeId, learnTypeName, specId, specName, protocolDate);
@@ -400,7 +411,7 @@ public class ProtocolsTab extends Tab {
         this.cbSpecialization.setItems(this.specializations);
         this.cbSpecialization.setValue(this.protocolForOperate.getSpecialization());
         if (this.protocolForOperate.getProtocolDate() != null) {
-            this.dpProtocolDate.setValue(LocalDate.parse(this.protocolForOperate.getProtocolDate(), DateTimeFormatter.ofPattern(getCommonDateFormat())));
+            this.dpProtocolDate.setValue(LocalDate.parse(this.protocolForOperate.getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat())));
         }
     }
 
@@ -443,10 +454,10 @@ public class ProtocolsTab extends Tab {
     private void validate() {
         if (this.protocolForOperate.getLearnType() != null && this.protocolForOperate.getLearnType().getId() != null
                 && this.protocolForOperate.getOrganization() != null && this.protocolForOperate.getOrganization().getId() != null
-                && this.protocolForOperate.getSpecialization()!= null && this.protocolForOperate.getSpecialization().getId() != null
-                && this.protocolForOperate.getProtocolNumber() != null && !"".equals(this.protocolForOperate.getProtocolNumber()) 
-                && this.protocolForOperate.getProtocolOwner()!= null && !"".equals(this.protocolForOperate.getProtocolOwner()) 
-                && this.protocolForOperate.getProtocolDate()!= null && !"".equals(this.protocolForOperate.getProtocolDate())) {
+                && this.protocolForOperate.getSpecialization() != null && this.protocolForOperate.getSpecialization().getId() != null
+                && this.protocolForOperate.getProtocolNumber() != null && !"".equals(this.protocolForOperate.getProtocolNumber())
+                && this.protocolForOperate.getProtocolOwner() != null && !"".equals(this.protocolForOperate.getProtocolOwner())
+                && this.protocolForOperate.getProtocolDate() != null && !"".equals(this.protocolForOperate.getProtocolDate())) {
             this.saveBtn.setDisable(false);
         }
     }

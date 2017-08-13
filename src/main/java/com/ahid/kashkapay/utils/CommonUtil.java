@@ -17,7 +17,11 @@ public final class CommonUtil {
         return UUID.randomUUID().toString();
     }
     
-    public static String getCommonDateFormat() {
+    public static String getDBDateFormat() {
         return "yyyy-MM-dd";
+    }
+    
+    public static String getUIDateFormat() {
+        return "dd.MM.yyyy";
     }
 }
