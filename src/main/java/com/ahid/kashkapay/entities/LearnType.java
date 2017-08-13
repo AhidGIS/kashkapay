@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "learn_types")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "LearnType.findAll", query = "SELECT l FROM LearnType l")
+    @NamedQuery(name = "LearnType.findAll", query = "SELECT l FROM LearnType l order by L.name")
     , @NamedQuery(name = "LearnType.existedCountByName", query = "SELECT count(l.id) FROM LearnType l WHERE UPPER(l.name) = UPPER(:name)")
     , @NamedQuery(name = "LearnType.existedCountByNotIdAndName", query = "SELECT count(l.id) FROM LearnType l WHERE l.id != :id and UPPER(l.name) = UPPER(:name)")
     , @NamedQuery(name = "LearnType.findById", query = "SELECT l FROM LearnType l WHERE l.id = :id")
@@ -46,6 +46,11 @@ public class LearnType implements Serializable {
 
     public LearnType(String id) {
         this.id = id;
+    }
+    
+    public LearnType(String id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public String getId() {

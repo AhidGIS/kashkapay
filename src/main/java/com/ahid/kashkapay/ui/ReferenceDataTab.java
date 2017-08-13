@@ -25,6 +25,7 @@ import static com.ahid.kashkapay.utils.UIUtil.showError;
 import static com.ahid.kashkapay.utils.UIUtil.showInfo;
 import static com.ahid.kashkapay.utils.UIUtil.showWarning;
 import java.util.stream.Collectors;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -57,11 +58,12 @@ import javafx.stage.Stage;
  */
 public class ReferenceDataTab extends Tab {
 
-    private Stage primaryStage;
+    private final Stage primaryStage;
+    private final ProtocolsTab protocolsView;
 
-    private TableView learnTypesTable = new TableView();
-    private TableView specializationsTable = new TableView();
-    private TableView organizationsTable = new TableView();
+    private final TableView learnTypesTable = new TableView();
+    private final TableView specializationsTable = new TableView();
+    private final TableView organizationsTable = new TableView();
 
     private TextField learnTypeNameTextEdit;
     private TextField specializationNameTextEdit;
@@ -78,8 +80,9 @@ public class ReferenceDataTab extends Tab {
     private Specialization specialization = null;
     private Organization organization = null;
 
-    public ReferenceDataTab(Stage primaryStage) {
+    public ReferenceDataTab(Stage primaryStage, ProtocolsTab protocolsView) {
         this.primaryStage = primaryStage;
+        this.protocolsView = protocolsView;
         this.initUI();
     }
 
@@ -105,6 +108,11 @@ public class ReferenceDataTab extends Tab {
         leftContent.setStyle(getCustomStyleForRootViews());
         SplitPane leftSplitPane1 = new SplitPane(this.initAndGetLearnTypesTable(), this.getLearnTypesEditorPane());
         leftSplitPane1.setOrientation(Orientation.VERTICAL);
+        new Thread(() -> {
+            Platform.runLater(() -> {
+                leftSplitPane1.setDividerPositions(0.7f, 0.3f);
+            });
+        }).start();
         leftSplitPane1.prefHeightProperty().bind(leftContent.heightProperty());
         leftContent.getChildren().add(leftSplitPane1);
 
@@ -112,6 +120,11 @@ public class ReferenceDataTab extends Tab {
         centerContent.setStyle(getCustomStyleForRootViews());
         SplitPane centerSplitPane1 = new SplitPane(this.initAndGetSpecializationsTable(), this.getSpecializationEditorPane());
         centerSplitPane1.setOrientation(Orientation.VERTICAL);
+        new Thread(() -> {
+            Platform.runLater(() -> {
+                centerSplitPane1.setDividerPositions(0.7f, 0.3f);
+            });
+        }).start();
         centerSplitPane1.prefHeightProperty().bind(centerContent.heightProperty());
         centerContent.getChildren().add(centerSplitPane1);
 
@@ -119,6 +132,11 @@ public class ReferenceDataTab extends Tab {
         rightContent.setStyle(getCustomStyleForRootViews());
         SplitPane rightSplitPane1 = new SplitPane(this.initAndGetOrganizationsTable(), this.getOrganizatonEditorPane());
         rightSplitPane1.setOrientation(Orientation.VERTICAL);
+        new Thread(() -> {
+            Platform.runLater(() -> {
+                rightSplitPane1.setDividerPositions(0.7f, 0.3f);
+            });
+        }).start();
         rightSplitPane1.prefHeightProperty().bind(rightContent.heightProperty());
         rightContent.getChildren().add(rightSplitPane1);
 
@@ -232,18 +250,6 @@ public class ReferenceDataTab extends Tab {
                 .stream().map(org -> new OrganizationModel(org.getId(), org.getName())).collect(Collectors.toList())));
     }
 
-//
-//    private void addActionsContextMenuToTableView(TableView table) {
-//        table.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-//
-//            @Override
-//            public void handle(MouseEvent t) {
-//                if (t.getButton() == MouseButton.SECONDARY) {
-//                    actionsContextMenu.show(table, t.getScreenX(), t.getScreenY());
-//                }
-//            }
-//        });
-//    }
     private Pane getLearnTypesEditorPane() {
         learnTypeNameTextEdit = new TextField();
         learnTypeNameTextEdit.setPromptText("Введите наименование");
@@ -257,10 +263,14 @@ public class ReferenceDataTab extends Tab {
 
                 if (showConfirmation("Вы подтверждаете сохранение вида обучения?").get() == ButtonType.OK) {
                     learnType.setName(learnTypeNameTextEdit.getText().trim());
+                    String id = learnType.getId();
                     LearnTypeService.save(learnType);
                     cancelLearnTypeSave();
                     fillLearnTypesTable();
                     showInfo("Вид обучения успешно сохранен");
+                    
+                    protocolsView.refreshLearnTypes();
+                    protocolsView.fillProtocolsTable();
                 }
             } catch (DuplicateException de) {
                 showError(de.getMessage());
@@ -295,10 +305,14 @@ public class ReferenceDataTab extends Tab {
 
                 if (showConfirmation("Вы подтверждаете сохранение специальности?").get() == ButtonType.OK) {
                     specialization.setName(specializationNameTextEdit.getText().trim());
+                    String id = specialization.getId();
                     SpecializationService.save(specialization);
                     cancelSpecializationSave();
                     fillSpecializationsTable();
                     showInfo("Специальность успешно сохранена");
+                    
+                    protocolsView.refreshSpecializations();
+                    protocolsView.fillProtocolsTable();
                 }
             } catch (DuplicateException de) {
                 showError(de.getMessage());
@@ -333,10 +347,14 @@ public class ReferenceDataTab extends Tab {
 
                 if (showConfirmation("Вы подтверждаете сохранение организации?").get() == ButtonType.OK) {
                     organization.setName(organizationNameTextEdit.getText().trim());
+                    String id = organization.getId();
                     OrganizationService.save(organization);
                     cancelOrganizationSave();
                     fillOrganizationsTable();
                     showInfo("Организация успешно сохранена");
+                    
+                    protocolsView.refreshOrganizations();
+                    protocolsView.fillProtocolsTable();
                 }
             } catch (DuplicateException de) {
                 showError(de.getMessage());
@@ -423,6 +441,7 @@ public class ReferenceDataTab extends Tab {
                     LearnTypeService.delete(ltm.toLearnType());
                     learnTypesTable.getItems().remove(ltm);
                     showInfo("Вид обучения успешно удален");
+                    protocolsView.refreshLearnTypes();
                 }
             } catch (ReferencesExistsException ex) {
                 showError(ex.getMessage());
@@ -454,13 +473,14 @@ public class ReferenceDataTab extends Tab {
         MenuItem removeItem = new MenuItem("Удалить");
         removeItem.setGraphic(new ImageView(getMenuItemDeleteIcon()));
         removeItem.setOnAction(event -> {
-                cancelSpecializationSave();
+            cancelSpecializationSave();
             try {
                 if (showConfirmation("Вы подтверждаете удаление специальности?").get() == ButtonType.OK) {
                     SpecializationModel model = (SpecializationModel) this.specializationsTable.getSelectionModel().getSelectedItem();
                     SpecializationService.delete(model.toSpecialization());
                     specializationsTable.getItems().remove(model);
                     showInfo("Специальность успешно удалена");
+                    protocolsView.refreshSpecializations();
                 }
             } catch (ReferencesExistsException ex) {
                 showError(ex.getMessage());
@@ -499,6 +519,7 @@ public class ReferenceDataTab extends Tab {
                     OrganizationService.delete(model.toOrganization());
                     organizationsTable.getItems().remove(model);
                     showInfo("Организация успешно удалена");
+                    protocolsView.refreshOrganizations();
                 }
             } catch (ReferencesExistsException ex) {
                 showError(ex.getMessage());

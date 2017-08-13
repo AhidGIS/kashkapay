@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "specializations")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Specialization.findAll", query = "SELECT s FROM Specialization s")
+    @NamedQuery(name = "Specialization.findAll", query = "SELECT s FROM Specialization s order by s.name")
     , @NamedQuery(name = "Specialization.existedCountByName", query = "SELECT count(s.id) FROM Specialization s WHERE s.name = :name")
     , @NamedQuery(name = "Specialization.existedCountByNotIdAndName", query = "SELECT count(s.id) FROM Specialization s WHERE s.id != :id and s.name = :name")
     , @NamedQuery(name = "Specialization.findById", query = "SELECT s FROM Specialization s WHERE s.id = :id")
@@ -46,6 +46,11 @@ public class Specialization implements Serializable {
 
     public Specialization(String id) {
         this.id = id;
+    }
+    
+    public Specialization(String id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public String getId() {

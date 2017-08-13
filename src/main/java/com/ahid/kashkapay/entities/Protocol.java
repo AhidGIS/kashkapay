@@ -28,6 +28,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Protocol.findAll", query = "SELECT p FROM Protocol p")
+    , @NamedQuery(name = "Protocol.existedCountByName", query = "SELECT count(p.id) FROM Protocol p WHERE p.protocolNumber = :protocolNumber and p.protocolDate = :protocolDate")
+    , @NamedQuery(name = "Protocol.existedCountByNotIdAndName", query = "SELECT count(p.id) FROM Protocol p WHERE p.id != :id and p.protocolNumber = :protocolNumber and p.protocolDate = :protocolDate")
     , @NamedQuery(name = "Protocol.countByLearnType", query = "SELECT count(p.id) FROM Protocol p WHERE p.learnType.id = :id")
     , @NamedQuery(name = "Protocol.countBySpecialization", query = "SELECT count(p.id) FROM Protocol p WHERE p.specialization.id = :id")
     , @NamedQuery(name = "Protocol.countByOrganization", query = "SELECT count(p.id) FROM Protocol p WHERE p.organization.id = :id")

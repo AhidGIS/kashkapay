@@ -47,25 +47,31 @@ public class MainApp extends Application {
         primaryStage.setMinHeight(500);
         primaryStage.setMinWidth(1000);
         primaryStage.getIcons().add(getMainIcon());
-        
+
         Group root = new Group();
         Scene scene = new Scene(root);
-        
+
         BorderPane borderPane = new BorderPane();
         borderPane.prefHeightProperty().bind(scene.heightProperty());
         borderPane.prefWidthProperty().bind(scene.widthProperty());
-        
+
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         borderPane.setCenter(tabPane);
-        
-        Tab referencesTab = new ReferenceDataTab(primaryStage);
-        Tab protocolsTab = new ProtocolsTab();
-        Tab certificatesTab = new CertifictesTab();
-        
+
+        ProtocolsTab protocolsTab = new ProtocolsTab(primaryStage);
+        ReferenceDataTab referencesTab = new ReferenceDataTab(primaryStage, protocolsTab);
+        CertifictesTab certificatesTab = new CertifictesTab();
+
         tabPane.getTabs().add(referencesTab);
         tabPane.getTabs().add(protocolsTab);
         tabPane.getTabs().add(certificatesTab);
+        tabPane.getSelectionModel().selectedItemProperty().addListener((tp, oldTab, newTab) -> {
+            if (oldTab.getClass().equals(ProtocolsTab.class) && !newTab.getClass().equals(ProtocolsTab.class)) {
+                ProtocolsTab pt = (ProtocolsTab) oldTab;
+                pt.setInactiveEditorView();
+            }
+        });
 
         root.getChildren().add(borderPane);
         primaryStage.setScene(scene);
