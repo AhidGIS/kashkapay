@@ -39,6 +39,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -190,6 +191,7 @@ public class ReferenceDataTab extends Tab {
         //this.addActionsContextMenuToTableView(this.learnTypesTable);
         this.learnTypesTable.setContextMenu(this.createLearnTypeContextMenu());
 
+        this.learnTypesTable.setTooltip(new Tooltip("Для выполнения операции нажмите праую кнопку мыши"));
         return this.learnTypesTable;
     }
 
@@ -211,6 +213,7 @@ public class ReferenceDataTab extends Tab {
         //this.addActionsContextMenuToTableView(this.specializationsTable);
         this.specializationsTable.setContextMenu(this.createSpecializationContextMenu());
 
+        this.specializationsTable.setTooltip(new Tooltip("Для выполнения операции нажмите праую кнопку мыши"));
         return this.specializationsTable;
     }
 
@@ -232,6 +235,7 @@ public class ReferenceDataTab extends Tab {
         //this.addActionsContextMenuToTableView(this.organizationsTable);
         this.organizationsTable.setContextMenu(this.createOrganizationContextMenu());
 
+        this.organizationsTable.setTooltip(new Tooltip("Для выполнения операции нажмите праую кнопку мыши"));
         return this.organizationsTable;
     }
 

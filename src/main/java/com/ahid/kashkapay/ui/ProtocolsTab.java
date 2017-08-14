@@ -15,6 +15,7 @@ import com.ahid.kashkapay.services.LearnTypeService;
 import com.ahid.kashkapay.services.OrganizationService;
 import com.ahid.kashkapay.services.ProtocolService;
 import com.ahid.kashkapay.services.SpecializationService;
+import com.ahid.kashkapay.ui.models.LearnTypeModel;
 import com.ahid.kashkapay.ui.models.ProtocolModel;
 import static com.ahid.kashkapay.utils.UIUtil.getCustomStyleForRootViews;
 import static com.ahid.kashkapay.utils.UIUtil.getMenuItemAddIcon;
@@ -93,6 +94,11 @@ public class ProtocolsTab extends Tab {
     private Button filterBtn;
     private Button resetFiltersBtn;
     private TextField tfCurrentYear;
+    private TextField tfFilterProtocolNumber;
+    private TextField tfFilterProtocolOwner;
+    private ComboBox cbFilterLearnType;
+    private ComboBox cbFilterOrganization;
+    private ComboBox cbFilterSpecialization;
 
     public ProtocolsTab(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -102,8 +108,6 @@ public class ProtocolsTab extends Tab {
 
     private void initUI() {
         this.setText("Протокола");
-
-        this.initDSsForComboItems();
 
         SplitPane content = new SplitPane();
         content.setStyle(getCustomStyleForRootViews());
@@ -117,6 +121,7 @@ public class ProtocolsTab extends Tab {
         }).start();
 
         this.setContent(content);
+        this.initDSsForComboItems();
     }
 
     private SplitPane initAndGetViewContent() {
@@ -319,27 +324,111 @@ public class ProtocolsTab extends Tab {
                 }
             }
         });
-        this.tfCurrentYear.setStyle("-fx-background-color: green;");
+        this.tfCurrentYear.setStyle("-fx-background-color: #48D1CC; -fx-margin: 0 0 0 100");
 
-        this.resetFiltersBtn = new Button("Сбросить фильтры");
+        this.tfFilterProtocolNumber = new TextField();
+        this.tfFilterProtocolNumber.setPromptText("Номер протокола");
+        this.tfFilterProtocolNumber.setPrefWidth(120);
+
+        this.tfFilterProtocolOwner = new TextField();
+        this.tfFilterProtocolOwner.setPromptText("ФИО");
+        this.tfFilterProtocolOwner.setPrefWidth(120);
+
+        this.cbFilterLearnType = new ComboBox();
+        this.cbFilterLearnType.setPromptText("Вид обучения");
+        this.cbFilterLearnType.setConverter(new StringConverter<LearnType>() {
+
+            @Override
+            public String toString(LearnType object) {
+                return object.getName();
+            }
+
+            @Override
+            public LearnType fromString(String string) {
+                return learnTypes.stream().filter(item -> item.getName().equals(string)).findFirst().orElse(null);
+            }
+        });
+
+        this.cbFilterOrganization = new ComboBox();
+        this.cbFilterOrganization.setPromptText("Цех (орг.)");
+        this.cbFilterOrganization.setConverter(new StringConverter<Organization>() {
+
+            @Override
+            public String toString(Organization object) {
+                return object.getName();
+            }
+
+            @Override
+            public Organization fromString(String string) {
+                return organizations.stream().filter(item -> item.getName().equals(string)).findFirst().orElse(null);
+            }
+        });
+
+        this.cbFilterSpecialization = new ComboBox();
+        this.cbFilterSpecialization.setPromptText("Профессия");
+        this.cbFilterSpecialization.setConverter(new StringConverter<Specialization>() {
+
+            @Override
+            public String toString(Specialization object) {
+                return object.getName();
+            }
+
+            @Override
+            public Specialization fromString(String string) {
+                return specializations.stream().filter(item -> item.getName().equals(string)).findFirst().orElse(null);
+            }
+        });
+
+        this.resetFiltersBtn = new Button("Сбросить");
         this.resetFiltersBtn.setOnAction(e -> {
-            filters = new HashMap<>();
-            String currYear = String.valueOf(LocalDate.now().getYear());
-            filters.put("current_year", currYear);
-            tfCurrentYear.setText(currYear);
-            //clear inputs later
-            fillProtocolsTable();
             disableCurrentYear();
+
+            tfFilterProtocolNumber.setText(null);
+            filters.remove("protocol_number");
+
+            tfFilterProtocolOwner.setText(null);
+            filters.remove("protocol_owner");
+
+            cbFilterLearnType.setValue(null);
+            filters.remove("learn_type_id");
+
+            cbFilterOrganization.setValue(null);
+            filters.remove("organization_id");
+
+            cbFilterSpecialization.setValue(null);
+            filters.remove("specialization_id");
         });
 
-        this.filterBtn = new Button("Фильтр");
+        this.filterBtn = new Button("Обновить");
         this.filterBtn.setOnAction(e -> {
-            filters.put("current_year", tfCurrentYear.getText());
-            fillProtocolsTable();
             disableCurrentYear();
+            filters.put("current_year", tfCurrentYear.getText());
+
+            if (!"".equals(tfFilterProtocolNumber.getText()) && tfFilterProtocolNumber.getText() != null) {
+                filters.put("protocol_number", tfFilterProtocolNumber.getText());
+            }
+
+            if (!"".equals(tfFilterProtocolOwner.getText()) && tfFilterProtocolOwner.getText() != null) {
+                filters.put("protocol_owner", tfFilterProtocolOwner.getText());
+            }
+
+            if (cbFilterLearnType.getValue() != null) {
+                filters.put("learn_type_id", ((LearnType) cbFilterLearnType.getValue()).getId());
+            }
+
+            if (cbFilterOrganization.getValue() != null) {
+                filters.put("organization_id", ((Organization) cbFilterOrganization.getValue()).getId());
+            }
+
+            if (cbFilterSpecialization.getValue() != null) {
+                filters.put("specialization_id", ((Specialization) cbFilterSpecialization.getValue()).getId());
+            }
+
+            fillProtocolsTable();
         });
 
-        filtersHb.getChildren().addAll(this.tfCurrentYear, this.resetFiltersBtn, this.filterBtn);
+        filtersHb.getChildren().addAll(this.tfCurrentYear, this.tfFilterProtocolNumber, this.tfFilterProtocolOwner,
+                this.cbFilterLearnType, this.cbFilterOrganization, this.cbFilterSpecialization, this.resetFiltersBtn, this.filterBtn);
         return filtersHb;
     }
 
@@ -364,15 +453,15 @@ public class ProtocolsTab extends Tab {
                 new PropertyValueFactory<ProtocolModel, String>("orgId"));
         orgId.setVisible(false);
 
-        TableColumn orgName = new TableColumn("Цех (организация)");
-        orgName.setCellValueFactory(
-                new PropertyValueFactory<ProtocolModel, String>("orgName"));
-        orgName.setResizable(true);
-
         TableColumn learnTypeId = new TableColumn("learnType");
         learnTypeId.setCellValueFactory(
                 new PropertyValueFactory<ProtocolModel, String>("learnTypeId"));
         learnTypeId.setVisible(false);
+
+        TableColumn orgName = new TableColumn("Цех (организация)");
+        orgName.setCellValueFactory(
+                new PropertyValueFactory<ProtocolModel, String>("orgName"));
+        orgName.setResizable(true);
 
         TableColumn learnTypeName = new TableColumn("Вид обучения");
         learnTypeName.setCellValueFactory(
@@ -403,13 +492,14 @@ public class ProtocolsTab extends Tab {
             }
         });
 
-        this.protocolsTable.getColumns().addAll(idCol, protocolNumber, protocolOwner, orgId, orgName,
-                learnTypeId, learnTypeName, specId, specName, protocolDate);
+        this.protocolsTable.getColumns().addAll(idCol, protocolNumber, protocolOwner, learnTypeId, learnTypeName,
+                orgId, orgName, specId, specName, protocolDate);
 
         this.protocolsTable.setContextMenu(this.createContextMenu());
 
         //this.protocolsTable.setColumnResizePolicy((param) -> true);
         this.fillProtocolsTable();
+        this.protocolsTable.setTooltip(new Tooltip("Для выполнения операции нажмите праую кнопку мыши"));
         return this.protocolsTable;
     }
 
@@ -496,7 +586,9 @@ public class ProtocolsTab extends Tab {
             Platform.runLater(() -> {
                 learnTypes = FXCollections.observableArrayList(LearnTypeService.getAll());
                 cbLearnType.getItems().clear();
-                cbLearnType.setItems(this.learnTypes);
+                cbLearnType.setItems(learnTypes);
+                cbFilterLearnType.getItems().clear();
+                cbFilterLearnType.setItems(learnTypes);
             });
         }).start();
     }
@@ -506,7 +598,9 @@ public class ProtocolsTab extends Tab {
             Platform.runLater(() -> {
                 organizations = FXCollections.observableArrayList(OrganizationService.getAll());
                 cbOrganization.getItems().clear();
-                cbOrganization.setItems(this.organizations);
+                cbOrganization.setItems(organizations);
+                cbFilterOrganization.getItems().clear();
+                cbFilterOrganization.setItems(organizations);
             });
         }).start();
     }
@@ -516,7 +610,9 @@ public class ProtocolsTab extends Tab {
             Platform.runLater(() -> {
                 specializations = FXCollections.observableArrayList(SpecializationService.getAll());
                 cbSpecialization.getItems().clear();
-                cbSpecialization.setItems(this.specializations);
+                cbSpecialization.setItems(specializations);
+                cbFilterSpecialization.getItems().clear();
+                cbFilterSpecialization.setItems(specializations);
             });
         }).start();
     }
