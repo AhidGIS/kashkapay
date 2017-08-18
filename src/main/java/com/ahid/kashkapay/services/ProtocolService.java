@@ -6,7 +6,6 @@
 package com.ahid.kashkapay.services;
 
 import com.ahid.kashkapay.entities.Protocol;
-import com.ahid.kashkapay.entities.Specialization;
 import com.ahid.kashkapay.exceptions.DuplicateException;
 import com.ahid.kashkapay.exceptions.ReferencesExistsException;
 import static com.ahid.kashkapay.utils.CommonUtil.uniqueString;
@@ -25,6 +24,13 @@ public class ProtocolService {
     public static List<Protocol> getAll() {
         Query query = EntityManagerFactoryHolder.createEntityManager().createNamedQuery("Protocol.findAll");
         return query.getResultList();
+    }
+    
+    public static List<Protocol> getAllForYear(String year) {
+        String sqlText = "select * from protocols p where strftime('%Y', p.protocol_date) = '" + year + "'";
+        Query query = EntityManagerFactoryHolder.createEntityManager()
+                .createNativeQuery(sqlText, Protocol.class);
+        return (List<Protocol>) query.getResultList();
     }
 
     public static List<Protocol> getFiltered(Map<String, String> filters) {

@@ -49,7 +49,7 @@ public class Protocol implements Serializable {
     private String protocolDate;
     @Column(name = "protocol_owner")
     private String protocolOwner;
-    @OneToMany(mappedBy = "protocolId")
+    @OneToMany(mappedBy = "protocol")
     private List<Certificate> certificatesList;
     @JoinColumn(name = "organization", referencedColumnName = "id")
     @ManyToOne

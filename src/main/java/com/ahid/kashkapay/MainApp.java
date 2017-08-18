@@ -1,7 +1,7 @@
 package com.ahid.kashkapay;
 
 import com.ahid.kashkapay.services.EntityManagerFactoryHolder;
-import com.ahid.kashkapay.ui.CertifictesTab;
+import com.ahid.kashkapay.ui.CertificatesTab;
 import com.ahid.kashkapay.ui.ProtocolsTab;
 import com.ahid.kashkapay.ui.ReferenceDataTab;
 import static com.ahid.kashkapay.utils.UIUtil.getMainIcon;
@@ -12,7 +12,6 @@ import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -60,9 +59,9 @@ public class MainApp extends Application {
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         borderPane.setCenter(tabPane);
 
-        ProtocolsTab protocolsTab = new ProtocolsTab(primaryStage);
-        ReferenceDataTab referencesTab = new ReferenceDataTab(primaryStage, protocolsTab);
-        CertifictesTab certificatesTab = new CertifictesTab();
+        CertificatesTab certificatesTab = new CertificatesTab(primaryStage);
+        ProtocolsTab protocolsTab = new ProtocolsTab(primaryStage, certificatesTab);
+        ReferenceDataTab referencesTab = new ReferenceDataTab(primaryStage, protocolsTab, certificatesTab);
 
         tabPane.getTabs().add(referencesTab);
         tabPane.getTabs().add(protocolsTab);

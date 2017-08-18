@@ -61,6 +61,7 @@ public class ReferenceDataTab extends Tab {
 
     private final Stage primaryStage;
     private final ProtocolsTab protocolsView;
+    private final CertificatesTab certificatesView;
 
     private final TableView learnTypesTable = new TableView();
     private final TableView specializationsTable = new TableView();
@@ -81,9 +82,10 @@ public class ReferenceDataTab extends Tab {
     private Specialization specialization = null;
     private Organization organization = null;
 
-    public ReferenceDataTab(Stage primaryStage, ProtocolsTab protocolsView) {
+    public ReferenceDataTab(Stage primaryStage, ProtocolsTab protocolsView, CertificatesTab certificatesView) {
         this.primaryStage = primaryStage;
         this.protocolsView = protocolsView;
+        this.certificatesView = certificatesView;
         this.initUI();
     }
 
@@ -275,6 +277,8 @@ public class ReferenceDataTab extends Tab {
                     
                     protocolsView.refreshLearnTypes();
                     protocolsView.fillProtocolsTable();
+                    certificatesView.refreshLearnTypes();
+                    certificatesView.fillCertificatesTable();
                 }
             } catch (DuplicateException de) {
                 showError(de.getMessage());
@@ -317,6 +321,8 @@ public class ReferenceDataTab extends Tab {
                     
                     protocolsView.refreshSpecializations();
                     protocolsView.fillProtocolsTable();
+                    certificatesView.refreshSpecializations();
+                    certificatesView.fillCertificatesTable();
                 }
             } catch (DuplicateException de) {
                 showError(de.getMessage());
@@ -359,6 +365,8 @@ public class ReferenceDataTab extends Tab {
                     
                     protocolsView.refreshOrganizations();
                     protocolsView.fillProtocolsTable();
+                    certificatesView.refreshOrganizations();
+                    certificatesView.fillCertificatesTable();
                 }
             } catch (DuplicateException de) {
                 showError(de.getMessage());
@@ -446,6 +454,7 @@ public class ReferenceDataTab extends Tab {
                     learnTypesTable.getItems().remove(ltm);
                     showInfo("Вид обучения успешно удален");
                     protocolsView.refreshLearnTypes();
+                    certificatesView.refreshLearnTypes();
                 }
             } catch (ReferencesExistsException ex) {
                 showError(ex.getMessage());
@@ -485,6 +494,7 @@ public class ReferenceDataTab extends Tab {
                     specializationsTable.getItems().remove(model);
                     showInfo("Специальность успешно удалена");
                     protocolsView.refreshSpecializations();
+                    certificatesView.refreshSpecializations();
                 }
             } catch (ReferencesExistsException ex) {
                 showError(ex.getMessage());
@@ -524,6 +534,7 @@ public class ReferenceDataTab extends Tab {
                     organizationsTable.getItems().remove(model);
                     showInfo("Организация успешно удалена");
                     protocolsView.refreshOrganizations();
+                    certificatesView.refreshOrganizations();
                 }
             } catch (ReferencesExistsException ex) {
                 showError(ex.getMessage());

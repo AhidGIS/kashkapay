@@ -25,7 +25,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Certificate.findAll", query = "SELECT c FROM Certificate c")
-    , @NamedQuery(name = "Certificate.countByProtocol", query = "SELECT count(c.id) FROM Certificate c WHERE c.protocolId.id = :id")
+    , @NamedQuery(name = "Certificate.existedCountByName", query = "SELECT count(c.id) FROM Certificate c WHERE c.certificateNumber = :certificateNumber and c.certificateDate = :certificateDate")
+    , @NamedQuery(name = "Certificate.existedCountByNotIdAndName", query = "SELECT count(c.id) FROM Certificate c WHERE c.id != :id and c.certificateNumber = :certificateNumber and c.certificateDate = :certificateDate")
+    , @NamedQuery(name = "Certificate.countByProtocol", query = "SELECT count(c.id) FROM Certificate c WHERE c.protocol.id = :id")
     , @NamedQuery(name = "Certificate.findById", query = "SELECT c FROM Certificate c WHERE c.id = :id")
     , @NamedQuery(name = "Certificate.findByCertificateNumber", query = "SELECT c FROM Certificate c WHERE c.certificateNumber = :certificateNumber")
     , @NamedQuery(name = "Certificate.findByCertificateDate", query = "SELECT c FROM Certificate c WHERE c.certificateDate = :certificateDate")
@@ -47,7 +49,7 @@ public class Certificate implements Serializable {
     private String birthDate;
     @JoinColumn(name = "protocol_id", referencedColumnName = "id")
     @ManyToOne
-    private Protocol protocolId;
+    private Protocol protocol;
 
     public Certificate() {
     }
@@ -96,12 +98,12 @@ public class Certificate implements Serializable {
         this.birthDate = birthDate;
     }
 
-    public Protocol getProtocolId() {
-        return protocolId;
+    public Protocol getProtocol() {
+        return protocol;
     }
 
-    public void setProtocolId(Protocol protocolId) {
-        this.protocolId = protocolId;
+    public void setProtocol(Protocol protocol) {
+        this.protocol = protocol;
     }
 
     @Override

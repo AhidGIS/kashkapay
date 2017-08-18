@@ -15,7 +15,6 @@ import com.ahid.kashkapay.services.LearnTypeService;
 import com.ahid.kashkapay.services.OrganizationService;
 import com.ahid.kashkapay.services.ProtocolService;
 import com.ahid.kashkapay.services.SpecializationService;
-import com.ahid.kashkapay.ui.models.LearnTypeModel;
 import com.ahid.kashkapay.ui.models.ProtocolModel;
 import static com.ahid.kashkapay.utils.UIUtil.getCustomStyleForRootViews;
 import static com.ahid.kashkapay.utils.UIUtil.getMenuItemAddIcon;
@@ -80,6 +79,7 @@ public class ProtocolsTab extends Tab {
     private ObservableList<Specialization> specializations;
 
     private final Stage primaryStage;
+    private final CertificatesTab certificatesView;
     private final TableView protocolsTable = new TableView();
     private VBox editorView;
     private Button saveBtn;
@@ -100,9 +100,10 @@ public class ProtocolsTab extends Tab {
     private ComboBox cbFilterOrganization;
     private ComboBox cbFilterSpecialization;
 
-    public ProtocolsTab(Stage primaryStage) {
+    public ProtocolsTab(Stage primaryStage, CertificatesTab certificatesTab) {
         this.primaryStage = primaryStage;
         this.filters = new HashMap<>();
+        this.certificatesView = certificatesTab;
         this.initUI();
     }
 
@@ -232,6 +233,9 @@ public class ProtocolsTab extends Tab {
                     setInactiveEditorView();
                     fillProtocolsTable();
                     showInfo("Протокол успешно сохранен");
+                    
+                    certificatesView.refreshProtocols();
+                    certificatesView.fillCertificatesTable();
                 }
             } catch (DuplicateException de) {
                 showError(de.getMessage());
@@ -321,6 +325,8 @@ public class ProtocolsTab extends Tab {
             public void handle(KeyEvent ke) {
                 if (ke.getCode().equals(KeyCode.ENTER)) {
                     disableCurrentYear();
+                    filters.put("current_year", tfCurrentYear.getText());
+                    fillProtocolsTable();
                 }
             }
         });
@@ -499,7 +505,7 @@ public class ProtocolsTab extends Tab {
 
         //this.protocolsTable.setColumnResizePolicy((param) -> true);
         this.fillProtocolsTable();
-        this.protocolsTable.setTooltip(new Tooltip("Для выполнения операции нажмите праую кнопку мыши"));
+        this.protocolsTable.setTooltip(new Tooltip("Для выполнения операции нажмите правую кнопку мыши"));
         return this.protocolsTable;
     }
 
@@ -518,7 +524,7 @@ public class ProtocolsTab extends Tab {
         MenuItem addItem = new MenuItem("Добавить");
         addItem.setGraphic(new ImageView(getMenuItemAddIcon()));
         addItem.setOnAction(event -> {
-            this.protocolForOperate = new Protocol();
+            protocolForOperate = new Protocol();
             this.setActiveEditorView();
         });
         cm.getItems().add(addItem);
@@ -526,7 +532,7 @@ public class ProtocolsTab extends Tab {
         editItem.setGraphic(new ImageView(getMenuItemEditIcon()));
         editItem.setOnAction(event -> {
             ProtocolModel model = (ProtocolModel) this.protocolsTable.getSelectionModel().getSelectedItem();
-            this.protocolForOperate = model.toProtocol();
+            protocolForOperate = model.toProtocol();
             this.setActiveEditorView();
         });
         cm.getItems().add(editItem);
@@ -539,6 +545,8 @@ public class ProtocolsTab extends Tab {
                     ProtocolService.delete(model.toProtocol());
                     protocolsTable.getItems().remove(model);
                     showInfo("Протокол успешно удален");
+                    
+                    certificatesView.refreshProtocols();
                 }
             } catch (ReferencesExistsException ex) {
                 showError(ex.getMessage());
