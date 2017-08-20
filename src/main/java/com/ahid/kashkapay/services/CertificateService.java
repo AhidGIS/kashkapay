@@ -69,6 +69,8 @@ public class CertificateService {
             sqlText = sqlText + " and protocol_id in (" + protocolSubquery + ")";
         }
         
+        sqlText += " order by certificate_date, certificate_number";
+        
         Query query = EntityManagerFactoryHolder.createEntityManager()
                 .createNativeQuery(sqlText, Certificate.class);
         return (List<Certificate>) query.getResultList();

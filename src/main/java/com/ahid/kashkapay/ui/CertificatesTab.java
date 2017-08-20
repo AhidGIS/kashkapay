@@ -173,12 +173,15 @@ public class CertificatesTab extends Tab {
 
             @Override
             public String toString(Protocol object) {
-                return object.getProtocolNumber();
+                return "№" + object.getProtocolNumber() + " от " + 
+                        (LocalDate.parse(object.getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))).format(DateTimeFormatter.ofPattern(getUIDateFormat()));
             }
 
             @Override
             public Protocol fromString(String string) {
-                return protocols.stream().filter(item -> item.getProtocolNumber().equals(string)).findFirst().orElse(null);
+                String[] parts = string.split(" от ");
+                return protocols.stream().filter(item -> item.getProtocolNumber().equals(parts[0].replace("№", "")) 
+                        && item.getProtocolDate().equals((LocalDate.parse(parts[1], DateTimeFormatter.ofPattern(getUIDateFormat()))).format(DateTimeFormatter.ofPattern(getDBDateFormat())))).findFirst().orElse(null);
             }
         });
         this.cbProtocol.valueProperty().addListener((ObservableValue observable, Object oldValue, Object newValue) -> {
@@ -260,15 +263,23 @@ public class CertificatesTab extends Tab {
     }
 
     private Pane initAndGetFilterContent() {
-        HBox filtersHb = new HBox();
-        filtersHb.setPadding(new Insets(10, 10, 10, 10));
-        filtersHb.setSpacing(10);
+        VBox filtersVb = new VBox();
+        filtersVb.setPadding(new Insets(10, 10, 10, 10));
+        filtersVb.setSpacing(10);
+        
+        HBox filtersHb1 = new HBox();
+        filtersHb1.setPadding(new Insets(10, 10, 10, 10));
+        filtersHb1.setSpacing(10);
+        
+        HBox filtersHb2 = new HBox();
+        filtersHb2.setPadding(new Insets(10, 10, 10, 10));
+        filtersHb2.setSpacing(10);
 
         String currentYear = String.valueOf(LocalDate.now().getYear());
         this.filters.put("current_year", currentYear);
         this.tfCurrentYear = new TextField(currentYear);
-        this.tfCurrentYear.setTooltip(new Tooltip("Для смены года нажмите дважды. Потом для завершения нажмите Enter"));
         this.tfCurrentYear.setPrefWidth(50);
+        this.tfCurrentYear.setTooltip(new Tooltip("Для смены года нажмите дважды. Потом для завершения нажмите Enter"));
         this.disableCurrentYear();
         this.tfCurrentYear.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -295,7 +306,6 @@ public class CertificatesTab extends Tab {
 
         this.tfFilterCertificateNumber = new TextField();
         this.tfFilterCertificateNumber.setPromptText("Номер сертификата");
-        this.tfFilterCertificateNumber.setPrefWidth(80);
 
         this.tfFilterCertificateOwner = new TextField();
         this.tfFilterCertificateOwner.setPromptText("ФИО");
@@ -303,7 +313,6 @@ public class CertificatesTab extends Tab {
         
         this.tfFilterCertificateOwnerBirthDate = new TextField();
         this.tfFilterCertificateOwnerBirthDate.setPromptText("Год рождения");
-        this.tfFilterCertificateOwnerBirthDate.setPrefWidth(60);
 
         this.cbFilterLearnType = new ComboBox();
         this.cbFilterLearnType.setPromptText("Вид обучения");
@@ -353,15 +362,17 @@ public class CertificatesTab extends Tab {
         this.cbFilterProtocol = new ComboBox();
         this.cbFilterProtocol.setPromptText("Протокол");
         this.cbFilterProtocol.setConverter(new StringConverter<Protocol>() {
-
             @Override
             public String toString(Protocol object) {
-                return object.getProtocolNumber();
+                return "№" + object.getProtocolNumber() + " от " + 
+                        (LocalDate.parse(object.getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))).format(DateTimeFormatter.ofPattern(getUIDateFormat()));
             }
 
             @Override
             public Protocol fromString(String string) {
-                return protocols.stream().filter(item -> item.getProtocolNumber().equals(string)).findFirst().orElse(null);
+                String[] parts = string.split(" от ");
+                return protocols.stream().filter(item -> item.getProtocolNumber().equals(parts[0].replace("№", "")) 
+                        && item.getProtocolDate().equals((LocalDate.parse(parts[1], DateTimeFormatter.ofPattern(getUIDateFormat()))).format(DateTimeFormatter.ofPattern(getDBDateFormat())))).findFirst().orElse(null);
             }
         });
 
@@ -427,11 +438,14 @@ public class CertificatesTab extends Tab {
             fillCertificatesTable();
         });
 
-        filtersHb.getChildren().addAll(this.tfCurrentYear, this.tfFilterCertificateNumber, 
-                this.tfFilterCertificateOwner, this.tfFilterCertificateOwnerBirthDate, this.cbFilterProtocol,
+        filtersHb1.getChildren().addAll(this.tfCurrentYear, this.tfFilterCertificateNumber, 
+                this.tfFilterCertificateOwner, this.tfFilterCertificateOwnerBirthDate);
+        filtersHb2.getChildren().addAll(this.cbFilterProtocol,
                 this.cbFilterLearnType, this.cbFilterOrganization, this.cbFilterSpecialization, 
                 this.resetFiltersBtn, this.filterBtn);
-        return filtersHb;
+        
+        filtersVb.getChildren().addAll(filtersHb1, filtersHb2);
+        return filtersVb;
     }
 
     private TableView initAndGetTableContent() {
@@ -491,9 +505,16 @@ public class CertificatesTab extends Tab {
         protocolId.setVisible(false);
         
         TableColumn protocolNumber = new TableColumn("Протокол");
-        protocolNumber.setCellValueFactory(
-                new PropertyValueFactory<ProtocolModel, String>("protocolNumber"));
         protocolNumber.setResizable(true);
+        protocolNumber.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<CertificateModel, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures cdf) {
+                SimpleStringProperty property = new SimpleStringProperty();
+                property.setValue("№" + ((CertificateModel) cdf.getValue()).getProtocolNumber() + " от " + 
+                        (LocalDate.parse(((CertificateModel) cdf.getValue()).getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))).format(DateTimeFormatter.ofPattern(getUIDateFormat())));
+                return property;
+            }
+        });
 
         TableColumn certificateDate = new TableColumn("Дата сертификата");
         certificateDate.setResizable(true);

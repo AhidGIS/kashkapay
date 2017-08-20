@@ -27,7 +27,7 @@ public class ProtocolService {
     }
     
     public static List<Protocol> getAllForYear(String year) {
-        String sqlText = "select * from protocols p where strftime('%Y', p.protocol_date) = '" + year + "'";
+        String sqlText = "select * from protocols p where strftime('%Y', p.protocol_date) = '" + year + "' order by p.protocol_date, p.protocol_number";
         Query query = EntityManagerFactoryHolder.createEntityManager()
                 .createNativeQuery(sqlText, Protocol.class);
         return (List<Protocol>) query.getResultList();
@@ -56,6 +56,8 @@ public class ProtocolService {
         if (filters.containsKey("specialization_id")) {
             sqlText += " and specialization = '" + filters.get("specialization_id") + "'";
         }
+        
+        sqlText += " order by protocol_date, protocol_number";
         
         Query query = EntityManagerFactoryHolder.createEntityManager()
                 .createNativeQuery(sqlText, Protocol.class);

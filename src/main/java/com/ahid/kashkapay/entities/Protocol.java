@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "protocols")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Protocol.findAll", query = "SELECT p FROM Protocol p")
+    @NamedQuery(name = "Protocol.findAll", query = "SELECT p FROM Protocol p order by p.protocolDate, p.protocolNumber")
     , @NamedQuery(name = "Protocol.existedCountByName", query = "SELECT count(p.id) FROM Protocol p WHERE p.protocolNumber = :protocolNumber and p.protocolDate = :protocolDate")
     , @NamedQuery(name = "Protocol.existedCountByNotIdAndName", query = "SELECT count(p.id) FROM Protocol p WHERE p.id != :id and p.protocolNumber = :protocolNumber and p.protocolDate = :protocolDate")
     , @NamedQuery(name = "Protocol.countByLearnType", query = "SELECT count(p.id) FROM Protocol p WHERE p.learnType.id = :id")

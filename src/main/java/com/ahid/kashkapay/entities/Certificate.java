@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "certificates")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Certificate.findAll", query = "SELECT c FROM Certificate c")
+    @NamedQuery(name = "Certificate.findAll", query = "SELECT c FROM Certificate c order by c.certificateDate, c.certificateNumber")
     , @NamedQuery(name = "Certificate.existedCountByName", query = "SELECT count(c.id) FROM Certificate c WHERE c.certificateNumber = :certificateNumber and c.certificateDate = :certificateDate")
     , @NamedQuery(name = "Certificate.existedCountByNotIdAndName", query = "SELECT count(c.id) FROM Certificate c WHERE c.id != :id and c.certificateNumber = :certificateNumber and c.certificateDate = :certificateDate")
     , @NamedQuery(name = "Certificate.countByProtocol", query = "SELECT count(c.id) FROM Certificate c WHERE c.protocol.id = :id")
