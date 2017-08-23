@@ -20,14 +20,30 @@ import com.ahid.kashkapay.services.SpecializationService;
 import com.ahid.kashkapay.ui.models.CertificateModel;
 import com.ahid.kashkapay.ui.models.ProtocolModel;
 import static com.ahid.kashkapay.utils.CommonUtil.getDBDateFormat;
+import static com.ahid.kashkapay.utils.CommonUtil.getPdfFontPath;
 import static com.ahid.kashkapay.utils.CommonUtil.getUIDateFormat;
 import static com.ahid.kashkapay.utils.UIUtil.getCustomStyleForRootViews;
 import static com.ahid.kashkapay.utils.UIUtil.getMenuItemAddIcon;
 import static com.ahid.kashkapay.utils.UIUtil.getMenuItemDeleteIcon;
 import static com.ahid.kashkapay.utils.UIUtil.getMenuItemEditIcon;
+import static com.ahid.kashkapay.utils.UIUtil.getMenuItemPdfIcon;
 import static com.ahid.kashkapay.utils.UIUtil.showConfirmation;
 import static com.ahid.kashkapay.utils.UIUtil.showError;
 import static com.ahid.kashkapay.utils.UIUtil.showInfo;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -48,6 +64,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
@@ -63,6 +80,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -581,6 +599,17 @@ public class CertificatesTab extends Tab {
             }
         });
         cm.getItems().add(removeItem);
+        
+        SeparatorMenuItem sep = new SeparatorMenuItem();
+        cm.getItems().add(sep);
+
+        MenuItem reportItem = new MenuItem("Отчет в PDF");
+        reportItem.setGraphic(new ImageView(getMenuItemPdfIcon()));
+        reportItem.setOnAction(event -> {
+            saveToPdf();
+        });
+        cm.getItems().add(reportItem);
+
         return cm;
     }
 
@@ -669,5 +698,81 @@ public class CertificatesTab extends Tab {
     public void disableCurrentYear() {
         tfCurrentYear.setEditable(false);
     }
+
+    private void saveToPdf() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Сохранить в PDF-файл");
+        fileChooser.setInitialDirectory(
+                new File(System.getProperty("user.home"))
+        );
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PDF", "*.pdf")
+        );
+        File file = fileChooser.showSaveDialog(primaryStage);
+        if (file != null) {
+            try {
+                generatePdfFromTableViewAndWriteToFile(file, certificatesTable);
+            } catch (DocumentException | IOException ex) {
+            }
+        }
+    }
     
+    private void generatePdfFromTableViewAndWriteToFile(File file, TableView certificatesTable) throws IOException, DocumentException {
+        String[] headers = new String[]{"ФИО", "Год рождения", "Организация", "Специальность", "№ протокола", "№ сертификата"};
+
+        Document document = new Document(PageSize.LETTER.rotate());
+
+        try {
+            PdfWriter.getInstance(document, new FileOutputStream(file));
+            document.open();
+
+            BaseFont bf = BaseFont.createFont(getPdfFontPath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            Font font = new Font(bf, 12, Font.BOLD);
+            Paragraph caption = new Paragraph("Сертификаты за " + filters.get("current_year") + " год", font);
+            caption.setAlignment(Element.ALIGN_CENTER);
+            document.add(caption);
+            document.add(new Paragraph());
+
+            Font fontHeader = new Font(bf, 10, Font.BOLD);
+            Font fontRow = new Font(bf, 10, Font.NORMAL);
+
+            PdfPTable table = new PdfPTable(headers.length);
+            for (String header : headers) {
+                PdfPCell cell = new PdfPCell();
+                cell.setGrayFill(0.9f);
+                cell.setPhrase(new Phrase(header.toUpperCase(), fontHeader));
+                table.addCell(cell);
+            }
+            table.completeRow();
+
+            certificatesTable.getItems().forEach(item -> {
+                CertificateModel certificate = (CertificateModel) item;
+
+                Phrase phrase1 = new Phrase(certificate.getCertificateOwner(), fontRow);
+                table.addCell(new PdfPCell(phrase1));
+                Phrase phrase2 = new Phrase(certificate.getCertificateOwnerBirthDate(), fontRow);
+                table.addCell(new PdfPCell(phrase2));
+                Phrase phrase3 = new Phrase(certificate.getOrgName(), fontRow);
+                table.addCell(new PdfPCell(phrase3));
+                Phrase phrase4 = new Phrase(certificate.getSpecName(), fontRow);
+                table.addCell(new PdfPCell(phrase4));
+                Phrase phrase5 = new Phrase(certificate.getProtocolNumber() + " от " 
+                        + LocalDate.parse(certificate.getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))
+                        .format(DateTimeFormatter.ofPattern(getUIDateFormat())), fontRow);
+                table.addCell(new PdfPCell(phrase5));
+                Phrase phrase6 = new Phrase(certificate.getCertificateNumber()+ " от " 
+                        + LocalDate.parse(certificate.getCertificateDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))
+                        .format(DateTimeFormatter.ofPattern(getUIDateFormat())), fontRow);
+                table.addCell(new PdfPCell(phrase6));
+
+                table.completeRow();
+            });
+
+            document.addTitle("PDF Table Demo");
+            document.add(table);
+        } catch (DocumentException e) {
+        } finally {
+            document.close();
+        }
+    }
 }

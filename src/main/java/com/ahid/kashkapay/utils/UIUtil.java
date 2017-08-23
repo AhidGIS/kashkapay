@@ -6,11 +6,9 @@
 package com.ahid.kashkapay.utils;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
@@ -70,5 +68,9 @@ public final class UIUtil {
     
     public static Image getMenuItemDeleteIcon() {
         return getIconByName("delete.png");
+    }
+    
+    public static Image getMenuItemPdfIcon() {
+        return getIconByName("pdf.png");
     }
 }

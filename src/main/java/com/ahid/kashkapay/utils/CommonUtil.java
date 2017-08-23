@@ -24,4 +24,8 @@ public final class CommonUtil {
     public static String getUIDateFormat() {
         return "dd.MM.yyyy";
     }
+    
+    public static String getPdfFontPath() {
+        return "e:\\arial.ttf";
+    }
 }

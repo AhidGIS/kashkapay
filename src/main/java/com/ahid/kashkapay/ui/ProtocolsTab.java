@@ -54,15 +54,33 @@ import javafx.util.StringConverter;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.util.Callback;
 import static com.ahid.kashkapay.utils.CommonUtil.getDBDateFormat;
+import static com.ahid.kashkapay.utils.CommonUtil.getPdfFontPath;
 import static com.ahid.kashkapay.utils.CommonUtil.getUIDateFormat;
+import static com.ahid.kashkapay.utils.UIUtil.getMenuItemPdfIcon;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.event.EventHandler;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
 
 /**
  *
@@ -233,7 +251,7 @@ public class ProtocolsTab extends Tab {
                     setInactiveEditorView();
                     fillProtocolsTable();
                     showInfo("Протокол успешно сохранен");
-                    
+
                     certificatesView.refreshProtocols();
                     certificatesView.fillCertificatesTable();
                 }
@@ -528,6 +546,7 @@ public class ProtocolsTab extends Tab {
             this.setActiveEditorView();
         });
         cm.getItems().add(addItem);
+
         MenuItem editItem = new MenuItem("Редактировать");
         editItem.setGraphic(new ImageView(getMenuItemEditIcon()));
         editItem.setOnAction(event -> {
@@ -536,6 +555,7 @@ public class ProtocolsTab extends Tab {
             this.setActiveEditorView();
         });
         cm.getItems().add(editItem);
+
         MenuItem removeItem = new MenuItem("Удалить");
         removeItem.setGraphic(new ImageView(getMenuItemDeleteIcon()));
         removeItem.setOnAction(event -> {
@@ -545,7 +565,7 @@ public class ProtocolsTab extends Tab {
                     ProtocolService.delete(model.toProtocol());
                     protocolsTable.getItems().remove(model);
                     showInfo("Протокол успешно удален");
-                    
+
                     certificatesView.refreshProtocols();
                 }
             } catch (ReferencesExistsException ex) {
@@ -553,6 +573,17 @@ public class ProtocolsTab extends Tab {
             }
         });
         cm.getItems().add(removeItem);
+        
+        SeparatorMenuItem sep = new SeparatorMenuItem();
+        cm.getItems().add(sep);
+
+        MenuItem reportItem = new MenuItem("Отчет в PDF");
+        reportItem.setGraphic(new ImageView(getMenuItemPdfIcon()));
+        reportItem.setOnAction(event -> {
+            saveToPdf();
+        });
+        cm.getItems().add(reportItem);
+
         return cm;
     }
 
@@ -638,5 +669,79 @@ public class ProtocolsTab extends Tab {
 
     public void disableCurrentYear() {
         tfCurrentYear.setEditable(false);
+    }
+
+    private void saveToPdf() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Сохранить в PDF-файл");
+        fileChooser.setInitialDirectory(
+                new File(System.getProperty("user.home"))
+        );
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PDF", "*.pdf")
+        );
+        File file = fileChooser.showSaveDialog(primaryStage);
+        if (file != null) {
+            try {
+                generatePdfFromTableViewAndWriteToFile(file, protocolsTable);
+            } catch (DocumentException | IOException ex) {
+            }
+        }
+    }
+
+    private void generatePdfFromTableViewAndWriteToFile(File file, TableView protocolsTable) throws IOException, DocumentException {
+        String[] headers = new String[]{"№ протокола", "ФИО", "Цех (организация)", "Вид обучения", "Профессия", "Дата протокола"};
+
+        Document document = new Document(PageSize.LETTER.rotate());
+
+        try {
+            PdfWriter.getInstance(document, new FileOutputStream(file));
+            document.open();
+
+            BaseFont bf = BaseFont.createFont(getPdfFontPath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            Font font = new Font(bf, 12, Font.BOLD);
+            Paragraph caption = new Paragraph("Протокола за " + filters.get("current_year") + " год", font);
+            caption.setAlignment(Element.ALIGN_CENTER);
+            document.add(caption);
+            document.add(new Paragraph());
+
+            Font fontHeader = new Font(bf, 10, Font.BOLD);
+            Font fontRow = new Font(bf, 10, Font.NORMAL);
+
+            PdfPTable table = new PdfPTable(headers.length);
+            for (String header : headers) {
+                PdfPCell cell = new PdfPCell();
+                cell.setGrayFill(0.9f);
+                cell.setPhrase(new Phrase(header.toUpperCase(), fontHeader));
+                table.addCell(cell);
+            }
+            table.completeRow();
+
+            protocolsTable.getItems().forEach(item -> {
+                ProtocolModel protocol = (ProtocolModel) item;
+
+                Phrase phrase1 = new Phrase(protocol.getProtocolNumber(), fontRow);
+                table.addCell(new PdfPCell(phrase1));
+                Phrase phrase2 = new Phrase(protocol.getProtocolOwner(), fontRow);
+                table.addCell(new PdfPCell(phrase2));
+                Phrase phrase3 = new Phrase(protocol.getOrgName(), fontRow);
+                table.addCell(new PdfPCell(phrase3));
+                Phrase phrase4 = new Phrase(protocol.getLearnTypeName(), fontRow);
+                table.addCell(new PdfPCell(phrase4));
+                Phrase phrase5 = new Phrase(protocol.getSpecName(), fontRow);
+                table.addCell(new PdfPCell(phrase5));
+                
+                Phrase phrase6 = new Phrase(LocalDate.parse(protocol.getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat())).format(DateTimeFormatter.ofPattern(getUIDateFormat())), fontRow);
+                table.addCell(new PdfPCell(phrase6));
+
+                table.completeRow();
+            });
+
+            document.addTitle("PDF Table Demo");
+            document.add(table);
+        } catch (DocumentException e) {
+        } finally {
+            document.close();
+        }
     }
 }
