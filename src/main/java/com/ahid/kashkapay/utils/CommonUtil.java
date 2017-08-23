@@ -13,6 +13,8 @@ import java.util.UUID;
  */
 public final class CommonUtil {
     
+    public static String PDF_FONT_PATH;
+    
     public static String uniqueString() {
         return UUID.randomUUID().toString();
     }
@@ -26,6 +28,6 @@ public final class CommonUtil {
     }
     
     public static String getPdfFontPath() {
-        return "e:\\arial.ttf";
+        return PDF_FONT_PATH;
     }
 }

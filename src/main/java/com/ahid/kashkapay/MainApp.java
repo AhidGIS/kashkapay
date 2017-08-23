@@ -4,6 +4,7 @@ import com.ahid.kashkapay.services.EntityManagerFactoryHolder;
 import com.ahid.kashkapay.ui.CertificatesTab;
 import com.ahid.kashkapay.ui.ProtocolsTab;
 import com.ahid.kashkapay.ui.ReferenceDataTab;
+import com.ahid.kashkapay.utils.CommonUtil;
 import static com.ahid.kashkapay.utils.UIUtil.getMainIcon;
 import java.util.HashMap;
 import java.util.Locale;
@@ -26,6 +27,8 @@ public class MainApp extends Application {
         props.put("javax.persistence.jdbc.url", "jdbc:sqlite:" + pathToDbFile);
         props.put("javax.persistence.jdbc.driver", "org.sqlite.JDBC");
         EntityManagerFactoryHolder.init(props);
+        
+        CommonUtil.PDF_FONT_PATH = arguments[1];
     }
 
     @Override
