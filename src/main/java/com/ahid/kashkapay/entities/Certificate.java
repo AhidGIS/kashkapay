@@ -40,7 +40,7 @@ public class Certificate implements Serializable {
     @Column(name = "id")
     private String id;
     @Column(name = "certificate_number")
-    private String certificateNumber;
+    private int certificateNumber;
     @Column(name = "certificate_date")
     private String certificateDate;
     @Column(name = "fullname")
@@ -66,11 +66,11 @@ public class Certificate implements Serializable {
         this.id = id;
     }
 
-    public String getCertificateNumber() {
+    public int getCertificateNumber() {
         return certificateNumber;
     }
 
-    public void setCertificateNumber(String certificateNumber) {
+    public void setCertificateNumber(int certificateNumber) {
         this.certificateNumber = certificateNumber;
     }
 

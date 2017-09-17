@@ -8,6 +8,7 @@ package com.ahid.kashkapay.ui.models;
 import com.ahid.kashkapay.entities.Certificate;
 import com.ahid.kashkapay.entities.Protocol;
 import java.util.Objects;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
@@ -17,12 +18,12 @@ import javafx.beans.property.SimpleStringProperty;
 public class CertificateModel {
     
     private final SimpleStringProperty id;
-    private final SimpleStringProperty certificateNumber;
+    private final SimpleIntegerProperty certificateNumber;
     private final SimpleStringProperty certificateDate;
     private final SimpleStringProperty certificateOwner;
     private final SimpleStringProperty certificateOwnerBirthDate;
     private final SimpleStringProperty protocolId;
-    private final SimpleStringProperty protocolNumber;
+    private final SimpleIntegerProperty protocolNumber;
     private final SimpleStringProperty protocolDate;
     private final SimpleStringProperty learnTypeId;
     private final SimpleStringProperty learnTypeName;
@@ -31,17 +32,17 @@ public class CertificateModel {
     private final SimpleStringProperty specId;
     private final SimpleStringProperty specName;
 
-    public CertificateModel(String id, String certificateNumber, String certificateDate, String certificateOwner, 
-            String certificateOwnerBirthDate, String protocolId, String protocolNumber, String protocolDate, 
+    public CertificateModel(String id, int certificateNumber, String certificateDate, String certificateOwner, 
+            String certificateOwnerBirthDate, String protocolId, int protocolNumber, String protocolDate, 
             String learnTypeId, String learnTypeName, String orgId, String orgName, String specId, 
             String specName) {
         this.id = new SimpleStringProperty(id);
-        this.certificateNumber = new SimpleStringProperty(certificateNumber);
+        this.certificateNumber = new SimpleIntegerProperty(certificateNumber);
         this.certificateDate = new SimpleStringProperty(certificateDate);
         this.certificateOwner = new SimpleStringProperty(certificateOwner);
         this.certificateOwnerBirthDate = new SimpleStringProperty(certificateOwnerBirthDate);
         this.protocolId = new SimpleStringProperty(protocolId);
-        this.protocolNumber = new SimpleStringProperty(protocolNumber);
+        this.protocolNumber = new SimpleIntegerProperty(protocolNumber);
         this.protocolDate = new SimpleStringProperty(protocolDate);
         this.learnTypeId = new SimpleStringProperty(learnTypeId);
         this.learnTypeName = new SimpleStringProperty(learnTypeName);
@@ -80,7 +81,7 @@ public class CertificateModel {
         return id.get();
     }
 
-    public String getCertificateNumber() {
+    public int getCertificateNumber() {
         return certificateNumber.get();
     }
 
@@ -100,7 +101,7 @@ public class CertificateModel {
         return protocolId.get();
     }
 
-    public String getProtocolNumber() {
+    public int getProtocolNumber() {
         return protocolNumber.get();
     }
 
@@ -136,7 +137,7 @@ public class CertificateModel {
         id.set(value);
     }
 
-    public void setCertificateNumber(String value) {
+    public void setCertificateNumber(int value) {
         certificateNumber.set(value);
     }
 
@@ -156,7 +157,7 @@ public class CertificateModel {
         protocolId.set(value);
     }
 
-    public void setProtocolNumber(String value) {
+    public void setProtocolNumber(int value) {
         protocolNumber.set(value);
     }
 

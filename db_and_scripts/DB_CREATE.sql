@@ -27,4 +27,6 @@ create table certificates (id text primary key,
 							fullname text,
 							birth_date date,
 							protocol_id text,
-							FOREIGN KEY(protocol_id) REFERENCES protocols(id));
+							organization_id text,
+							FOREIGN KEY(protocol_id) REFERENCES protocols(id),
+							FOREIGN KEY(organization_id) REFERENCES organizations(id));

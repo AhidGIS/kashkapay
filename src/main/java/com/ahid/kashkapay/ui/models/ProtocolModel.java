@@ -10,6 +10,7 @@ import com.ahid.kashkapay.entities.Organization;
 import com.ahid.kashkapay.entities.Protocol;
 import com.ahid.kashkapay.entities.Specialization;
 import java.util.Objects;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
@@ -19,7 +20,7 @@ import javafx.beans.property.SimpleStringProperty;
 public class ProtocolModel {
     
     private final SimpleStringProperty id;
-    private final SimpleStringProperty protocolNumber;
+    private final SimpleIntegerProperty protocolNumber;
     private final SimpleStringProperty protocolDate;
     private final SimpleStringProperty protocolOwner;
     private final SimpleStringProperty learnTypeId;
@@ -29,10 +30,10 @@ public class ProtocolModel {
     private final SimpleStringProperty specId;
     private final SimpleStringProperty specName;
 
-    public ProtocolModel(String id, String protocolNumber, String protocolDate, String protocolOwner, 
+    public ProtocolModel(String id, int protocolNumber, String protocolDate, String protocolOwner, 
             String learnTypeId, String learnTypeName, String orgId, String orgName, String specId, String specName) {
         this.id = new SimpleStringProperty(id);
-        this.protocolNumber = new SimpleStringProperty(protocolNumber);
+        this.protocolNumber = new SimpleIntegerProperty(protocolNumber);
         this.protocolDate = new SimpleStringProperty(protocolDate);
         this.protocolOwner = new SimpleStringProperty(protocolOwner);
         this.learnTypeId = new SimpleStringProperty(learnTypeId);
@@ -73,7 +74,7 @@ public class ProtocolModel {
         return id.get();
     }
 
-    public String getProtocolNumber() {
+    public int getProtocolNumber() {
         return protocolNumber.get();
     }
 
@@ -113,7 +114,7 @@ public class ProtocolModel {
         this.id.set(id);
     }
 
-    public void setProtocolNumber(String protocolNumber) {
+    public void setProtocolNumber(int protocolNumber) {
         this.protocolNumber.set(protocolNumber);
     }
 
@@ -178,9 +179,6 @@ public class ProtocolModel {
         }
         final ProtocolModel other = (ProtocolModel) obj;
         if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        if (!Objects.equals(this.protocolNumber, other.protocolNumber)) {
             return false;
         }
         if (!Objects.equals(this.protocolDate, other.protocolDate)) {

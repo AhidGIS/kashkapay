@@ -44,7 +44,7 @@ public class Protocol implements Serializable {
     @Column(name = "id")
     private String id;
     @Column(name = "protocol_number")
-    private String protocolNumber;
+    private int protocolNumber;
     @Column(name = "protocol_date")
     private String protocolDate;
     @Column(name = "protocol_owner")
@@ -76,11 +76,11 @@ public class Protocol implements Serializable {
         this.id = id;
     }
 
-    public String getProtocolNumber() {
+    public int getProtocolNumber() {
         return protocolNumber;
     }
 
-    public void setProtocolNumber(String protocolNumber) {
+    public void setProtocolNumber(int protocolNumber) {
         this.protocolNumber = protocolNumber;
     }
 

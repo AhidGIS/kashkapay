@@ -162,7 +162,13 @@ public class ProtocolsTab extends Tab {
         this.tfProtocolNumber = new TextField();
         this.tfProtocolNumber.textProperty().addListener((observable, oldValue, newValue) -> {
             if ((newValue == null || !newValue.equals(oldValue)) && protocolForOperate != null) {
-                protocolForOperate.setProtocolNumber(newValue);
+                if (!newValue.matches("\\d+")) {
+                    protocolForOperate.setProtocolNumber(Integer.valueOf(oldValue));
+                    this.tfProtocolNumber.setText(oldValue);
+                } else {
+                    protocolForOperate.setProtocolNumber(Integer.valueOf(newValue));
+                    this.tfProtocolNumber.setText(newValue);
+                }
                 validate();
             }
         });
@@ -326,7 +332,8 @@ public class ProtocolsTab extends Tab {
         this.filters.put("current_year", currentYear);
         this.tfCurrentYear = new TextField(currentYear);
         this.tfCurrentYear.setTooltip(new Tooltip("Для смены года нажмите дважды. Потом для завершения нажмите Enter"));
-        this.tfCurrentYear.setMinWidth(20);
+        this.tfCurrentYear.setMinWidth(45);
+        this.tfCurrentYear.setMaxWidth(45);
         this.disableCurrentYear();
         this.tfCurrentYear.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -352,14 +359,17 @@ public class ProtocolsTab extends Tab {
 
         this.tfFilterProtocolNumber = new TextField();
         this.tfFilterProtocolNumber.setPromptText("Номер протокола");
-        this.tfFilterProtocolNumber.setPrefWidth(120);
+        this.tfFilterProtocolNumber.setMinWidth(120);
+        this.tfFilterProtocolNumber.setMaxWidth(120);
 
         this.tfFilterProtocolOwner = new TextField();
         this.tfFilterProtocolOwner.setPromptText("ФИО");
-        this.tfFilterProtocolOwner.setPrefWidth(120);
+        this.tfFilterProtocolOwner.setMinWidth(120);
+        this.tfFilterProtocolOwner.setMaxWidth(120);
 
         this.cbFilterLearnType = new ComboBox();
         this.cbFilterLearnType.setPromptText("Вид обучения");
+        this.cbFilterLearnType.setPrefWidth(120);
         this.cbFilterLearnType.setConverter(new StringConverter<LearnType>() {
 
             @Override
@@ -375,6 +385,7 @@ public class ProtocolsTab extends Tab {
 
         this.cbFilterOrganization = new ComboBox();
         this.cbFilterOrganization.setPromptText("Цех (орг.)");
+        this.cbFilterOrganization.setPrefWidth(120);
         this.cbFilterOrganization.setConverter(new StringConverter<Organization>() {
 
             @Override
@@ -390,6 +401,7 @@ public class ProtocolsTab extends Tab {
 
         this.cbFilterSpecialization = new ComboBox();
         this.cbFilterSpecialization.setPromptText("Профессия");
+        this.cbFilterSpecialization.setPrefWidth(150);
         this.cbFilterSpecialization.setConverter(new StringConverter<Specialization>() {
 
             @Override
@@ -404,7 +416,8 @@ public class ProtocolsTab extends Tab {
         });
 
         this.resetFiltersBtn = new Button("Сбросить");
-        this.resetFiltersBtn.setMinWidth(50);
+        this.resetFiltersBtn.setMinWidth(100);
+        this.resetFiltersBtn.setMaxWidth(100);
         this.resetFiltersBtn.setOnAction(e -> {
             disableCurrentYear();
 
@@ -425,7 +438,8 @@ public class ProtocolsTab extends Tab {
         });
 
         this.filterBtn = new Button("Обновить");
-        this.filterBtn.setMinWidth(50);
+        this.filterBtn.setMinWidth(100);
+        this.filterBtn.setMaxWidth(100);
         this.filterBtn.setOnAction(e -> {
             disableCurrentYear();
             filters.put("current_year", tfCurrentYear.getText());
@@ -603,7 +617,7 @@ public class ProtocolsTab extends Tab {
 
     private void setActiveEditorView() {
         this.editorView.setDisable(false);
-        this.tfProtocolNumber.setText(this.protocolForOperate.getProtocolNumber());
+        this.tfProtocolNumber.setText(String.valueOf(this.protocolForOperate.getProtocolNumber()));
         this.tfProtocolOwner.setText(this.protocolForOperate.getProtocolOwner());
         this.cbOrganization.setItems(this.organizations);
         this.cbOrganization.setValue(this.protocolForOperate.getOrganization());
@@ -662,7 +676,7 @@ public class ProtocolsTab extends Tab {
         if (this.protocolForOperate.getLearnType() != null && this.protocolForOperate.getLearnType().getId() != null
                 && this.protocolForOperate.getOrganization() != null && this.protocolForOperate.getOrganization().getId() != null
                 && this.protocolForOperate.getSpecialization() != null && this.protocolForOperate.getSpecialization().getId() != null
-                && this.protocolForOperate.getProtocolNumber() != null && !"".equals(this.protocolForOperate.getProtocolNumber())
+                && this.protocolForOperate.getProtocolNumber() != 0
                 && this.protocolForOperate.getProtocolOwner() != null && !"".equals(this.protocolForOperate.getProtocolOwner())
                 && this.protocolForOperate.getProtocolDate() != null && !"".equals(this.protocolForOperate.getProtocolDate())) {
             this.saveBtn.setDisable(false);
@@ -722,7 +736,7 @@ public class ProtocolsTab extends Tab {
             protocolsTable.getItems().forEach(item -> {
                 ProtocolModel protocol = (ProtocolModel) item;
 
-                Phrase phrase1 = new Phrase(protocol.getProtocolNumber(), fontRow);
+                Phrase phrase1 = new Phrase(String.valueOf(protocol.getProtocolNumber()), fontRow);
                 table.addCell(new PdfPCell(phrase1));
                 Phrase phrase2 = new Phrase(protocol.getProtocolOwner(), fontRow);
                 table.addCell(new PdfPCell(phrase2));

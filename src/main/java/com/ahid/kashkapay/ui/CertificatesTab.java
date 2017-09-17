@@ -143,9 +143,9 @@ public class CertificatesTab extends Tab {
         }).start();
 
         this.setContent(content);
-        this.initDSsForComboItems();      
+        this.initDSsForComboItems();
     }
-    
+
     private SplitPane initAndGetViewContent() {
         SplitPane viewContent = new SplitPane(this.initAndGetFilterContent(), this.initAndGetTableContent());
         viewContent.setOrientation(Orientation.VERTICAL);
@@ -165,7 +165,13 @@ public class CertificatesTab extends Tab {
         this.tfCertificateNumber = new TextField();
         this.tfCertificateNumber.textProperty().addListener((observable, oldValue, newValue) -> {
             if ((newValue == null || !newValue.equals(oldValue)) && certificateForOperate != null) {
-                certificateForOperate.setCertificateNumber(newValue);
+                if (!newValue.matches("\\d+")) {
+                    certificateForOperate.setCertificateNumber(Integer.valueOf(oldValue));
+                    this.tfCertificateNumber.setText(oldValue);
+                } else {
+                    certificateForOperate.setCertificateNumber(Integer.valueOf(newValue));
+                    this.tfCertificateNumber.setText(newValue);
+                }
                 validate();
             }
         });
@@ -177,7 +183,7 @@ public class CertificatesTab extends Tab {
                 validate();
             }
         });
-        
+
         this.tfCertificateOwnerBirthDate = new TextField();
         this.tfCertificateOwnerBirthDate.textProperty().addListener((observable, oldValue, newValue) -> {
             if ((newValue == null || !newValue.equals(oldValue)) && certificateForOperate != null) {
@@ -191,14 +197,14 @@ public class CertificatesTab extends Tab {
 
             @Override
             public String toString(Protocol object) {
-                return "№" + object.getProtocolNumber() + " от " + 
-                        (LocalDate.parse(object.getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))).format(DateTimeFormatter.ofPattern(getUIDateFormat()));
+                return "№" + object.getProtocolNumber() + " от "
+                        + (LocalDate.parse(object.getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))).format(DateTimeFormatter.ofPattern(getUIDateFormat()));
             }
 
             @Override
             public Protocol fromString(String string) {
                 String[] parts = string.split(" от ");
-                return protocols.stream().filter(item -> item.getProtocolNumber().equals(parts[0].replace("№", "")) 
+                return protocols.stream().filter(item -> item.getProtocolNumber() == Integer.valueOf((parts[0].replace("№", "")))
                         && item.getProtocolDate().equals((LocalDate.parse(parts[1], DateTimeFormatter.ofPattern(getUIDateFormat()))).format(DateTimeFormatter.ofPattern(getDBDateFormat())))).findFirst().orElse(null);
             }
         });
@@ -284,11 +290,11 @@ public class CertificatesTab extends Tab {
         VBox filtersVb = new VBox();
         filtersVb.setPadding(new Insets(10, 10, 10, 10));
         filtersVb.setSpacing(10);
-        
+
         HBox filtersHb1 = new HBox();
         filtersHb1.setPadding(new Insets(10, 10, 10, 10));
         filtersHb1.setSpacing(10);
-        
+
         HBox filtersHb2 = new HBox();
         filtersHb2.setPadding(new Insets(10, 10, 10, 10));
         filtersHb2.setSpacing(10);
@@ -296,7 +302,8 @@ public class CertificatesTab extends Tab {
         String currentYear = String.valueOf(LocalDate.now().getYear());
         this.filters.put("current_year", currentYear);
         this.tfCurrentYear = new TextField(currentYear);
-        this.tfCurrentYear.setMinWidth(20);
+        this.tfCurrentYear.setMinWidth(45);
+        this.tfCurrentYear.setMaxWidth(45);
         this.tfCurrentYear.setTooltip(new Tooltip("Для смены года нажмите дважды. Потом для завершения нажмите Enter"));
         this.disableCurrentYear();
         this.tfCurrentYear.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -328,7 +335,7 @@ public class CertificatesTab extends Tab {
         this.tfFilterCertificateOwner = new TextField();
         this.tfFilterCertificateOwner.setPromptText("ФИО");
         this.tfFilterCertificateOwner.setPrefWidth(80);
-        
+
         this.tfFilterCertificateOwnerBirthDate = new TextField();
         this.tfFilterCertificateOwnerBirthDate.setPromptText("Год рождения");
 
@@ -382,20 +389,21 @@ public class CertificatesTab extends Tab {
         this.cbFilterProtocol.setConverter(new StringConverter<Protocol>() {
             @Override
             public String toString(Protocol object) {
-                return "№" + object.getProtocolNumber() + " от " + 
-                        (LocalDate.parse(object.getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))).format(DateTimeFormatter.ofPattern(getUIDateFormat()));
+                return "№" + object.getProtocolNumber() + " от "
+                        + (LocalDate.parse(object.getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))).format(DateTimeFormatter.ofPattern(getUIDateFormat()));
             }
 
             @Override
             public Protocol fromString(String string) {
                 String[] parts = string.split(" от ");
-                return protocols.stream().filter(item -> item.getProtocolNumber().equals(parts[0].replace("№", "")) 
+                return protocols.stream().filter(item -> item.getProtocolNumber() == Integer.valueOf((parts[0].replace("№", "")))
                         && item.getProtocolDate().equals((LocalDate.parse(parts[1], DateTimeFormatter.ofPattern(getUIDateFormat()))).format(DateTimeFormatter.ofPattern(getDBDateFormat())))).findFirst().orElse(null);
             }
         });
 
         this.resetFiltersBtn = new Button("Сбросить");
-        this.resetFiltersBtn.setMinWidth(50);
+        this.resetFiltersBtn.setMinWidth(100);
+        this.resetFiltersBtn.setMaxWidth(100);
         this.resetFiltersBtn.setOnAction(e -> {
             disableCurrentYear();
 
@@ -407,7 +415,7 @@ public class CertificatesTab extends Tab {
 
             tfFilterCertificateOwnerBirthDate.setText(null);
             filters.remove("birth_date");
-            
+
             cbFilterProtocol.setValue(null);
             filters.remove("protocol_id");
 
@@ -422,7 +430,8 @@ public class CertificatesTab extends Tab {
         });
 
         this.filterBtn = new Button("Обновить");
-        this.filterBtn.setMinWidth(50);
+        this.filterBtn.setMinWidth(100);
+        this.filterBtn.setMaxWidth(100);
         this.filterBtn.setOnAction(e -> {
             disableCurrentYear();
             filters.put("current_year", tfCurrentYear.getText());
@@ -458,12 +467,12 @@ public class CertificatesTab extends Tab {
             fillCertificatesTable();
         });
 
-        filtersHb1.getChildren().addAll(this.tfCurrentYear, this.tfFilterCertificateNumber, 
+        filtersHb1.getChildren().addAll(this.tfCurrentYear, this.tfFilterCertificateNumber,
                 this.tfFilterCertificateOwner, this.tfFilterCertificateOwnerBirthDate);
         filtersHb2.getChildren().addAll(this.cbFilterProtocol,
-                this.cbFilterLearnType, this.cbFilterOrganization, this.cbFilterSpecialization, 
+                this.cbFilterLearnType, this.cbFilterOrganization, this.cbFilterSpecialization,
                 this.resetFiltersBtn, this.filterBtn);
-        
+
         filtersVb.getChildren().addAll(filtersHb1, filtersHb2);
         return filtersVb;
     }
@@ -483,7 +492,7 @@ public class CertificatesTab extends Tab {
         certificateOwner.setCellValueFactory(
                 new PropertyValueFactory<ProtocolModel, String>("certificateOwner"));
         certificateOwner.setResizable(true);
-        
+
         TableColumn certificateOwnerBirthDate = new TableColumn("Год рождения");
         certificateOwnerBirthDate.setCellValueFactory(
                 new PropertyValueFactory<ProtocolModel, String>("certificateOwnerBirthDate"));
@@ -523,15 +532,15 @@ public class CertificatesTab extends Tab {
         protocolId.setCellValueFactory(
                 new PropertyValueFactory<ProtocolModel, String>("protocolId"));
         protocolId.setVisible(false);
-        
+
         TableColumn protocolNumber = new TableColumn("Протокол");
         protocolNumber.setResizable(true);
         protocolNumber.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<CertificateModel, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TableColumn.CellDataFeatures cdf) {
                 SimpleStringProperty property = new SimpleStringProperty();
-                property.setValue("№" + ((CertificateModel) cdf.getValue()).getProtocolNumber() + " от " + 
-                        (LocalDate.parse(((CertificateModel) cdf.getValue()).getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))).format(DateTimeFormatter.ofPattern(getUIDateFormat())));
+                property.setValue("№" + ((CertificateModel) cdf.getValue()).getProtocolNumber() + " от "
+                        + (LocalDate.parse(((CertificateModel) cdf.getValue()).getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))).format(DateTimeFormatter.ofPattern(getUIDateFormat())));
                 return property;
             }
         });
@@ -601,7 +610,7 @@ public class CertificatesTab extends Tab {
             }
         });
         cm.getItems().add(removeItem);
-        
+
         SeparatorMenuItem sep = new SeparatorMenuItem();
         cm.getItems().add(sep);
 
@@ -628,12 +637,12 @@ public class CertificatesTab extends Tab {
 
     private void setActiveEditorView() {
         this.editorView.setDisable(false);
-        this.tfCertificateNumber.setText(this.certificateForOperate.getCertificateNumber());
+        this.tfCertificateNumber.setText(String.valueOf(this.certificateForOperate.getCertificateNumber()));
         this.tfCertificateOwner.setText(this.certificateForOperate.getFullname());
         this.tfCertificateOwnerBirthDate.setText(this.certificateForOperate.getBirthDate());
         this.cbProtocol.setItems(this.protocols);
         this.cbProtocol.setValue(this.certificateForOperate.getProtocol());
-        if (this.certificateForOperate.getCertificateDate()!= null) {
+        if (this.certificateForOperate.getCertificateDate() != null) {
             this.dpCertificateDate.setValue(LocalDate.parse(this.certificateForOperate.getCertificateDate(), DateTimeFormatter.ofPattern(getDBDateFormat())));
         }
     }
@@ -674,7 +683,7 @@ public class CertificatesTab extends Tab {
             });
         }).start();
     }
-    
+
     void refreshProtocols() {
         new Thread(() -> {
             Platform.runLater(() -> {
@@ -688,11 +697,10 @@ public class CertificatesTab extends Tab {
     }
 
     private void validate() {
-        if (this.certificateForOperate.getProtocol()!= null && this.certificateForOperate.getProtocol().getId() != null
-                && this.certificateForOperate.getCertificateNumber()!= null && !"".equals(this.certificateForOperate.getCertificateNumber())
-                && this.certificateForOperate.getFullname()!= null && !"".equals(this.certificateForOperate.getFullname())
-                && this.certificateForOperate.getCertificateDate()!= null && !"".equals(this.certificateForOperate.getCertificateDate())
-                && this.certificateForOperate.getBirthDate()!= null && !"".equals(this.certificateForOperate.getBirthDate())) {
+        if (this.certificateForOperate.getProtocol() != null && this.certificateForOperate.getProtocol().getId() != null
+                && this.certificateForOperate.getCertificateNumber() != 0
+                && this.certificateForOperate.getFullname() != null && !"".equals(this.certificateForOperate.getFullname())
+                && this.certificateForOperate.getCertificateDate() != null && !"".equals(this.certificateForOperate.getCertificateDate())) {
             this.saveBtn.setDisable(false);
         }
     }
@@ -718,9 +726,9 @@ public class CertificatesTab extends Tab {
             }
         }
     }
-    
+
     private void generatePdfFromTableViewAndWriteToFile(File file, TableView certificatesTable) throws IOException, DocumentException {
-        String[] headers = new String[]{ "№ удостоверения", "ФИО", "Год рождения", "Организация", "Специальность", "№ протокола"};
+        String[] headers = new String[]{"№ удостоверения", "ФИО", "Год рождения", "Организация", "Специальность", "№ протокола"};
 
         Document document = new Document(PageSize.LETTER.rotate());
 
@@ -750,9 +758,9 @@ public class CertificatesTab extends Tab {
             certificatesTable.getItems().forEach(item -> {
                 CertificateModel certificate = (CertificateModel) item;
 
-                Phrase phrase6 = new Phrase(certificate.getCertificateNumber()+ " от " 
+                Phrase phrase6 = new Phrase(certificate.getCertificateNumber() + " от "
                         + LocalDate.parse(certificate.getCertificateDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))
-                        .format(DateTimeFormatter.ofPattern(getUIDateFormat())), fontRow);
+                                .format(DateTimeFormatter.ofPattern(getUIDateFormat())), fontRow);
                 table.addCell(new PdfPCell(phrase6));
                 Phrase phrase1 = new Phrase(certificate.getCertificateOwner(), fontRow);
                 table.addCell(new PdfPCell(phrase1));
@@ -762,9 +770,9 @@ public class CertificatesTab extends Tab {
                 table.addCell(new PdfPCell(phrase3));
                 Phrase phrase4 = new Phrase(certificate.getSpecName(), fontRow);
                 table.addCell(new PdfPCell(phrase4));
-                Phrase phrase5 = new Phrase(certificate.getProtocolNumber() + " от " 
+                Phrase phrase5 = new Phrase(certificate.getProtocolNumber() + " от "
                         + LocalDate.parse(certificate.getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))
-                        .format(DateTimeFormatter.ofPattern(getUIDateFormat())), fontRow);
+                                .format(DateTimeFormatter.ofPattern(getUIDateFormat())), fontRow);
                 table.addCell(new PdfPCell(phrase5));
 
                 table.completeRow();
