@@ -675,6 +675,7 @@ public class CertificatesTab extends Tab {
         this.tfCertificateOwner.setText(this.certificateForOperate.getFullname());
         this.tfCertificateOwnerBirthDate.setText(this.certificateForOperate.getBirthDate());
         this.cbOrganization.setItems(this.organizations);
+        this.cbOrganization.setValue(this.certificateForOperate.getOrganization());
         this.cbProtocol.setItems(this.protocols);
         this.cbProtocol.setValue(this.certificateForOperate.getProtocol());
         if (this.certificateForOperate.getCertificateDate() != null) {

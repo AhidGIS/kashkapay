@@ -1,0 +1,30 @@
+create table protocols2 (id text primary key, 
+						protocol_number integer, 
+						protocol_date date, 
+						protocol_owner text, 
+						learn_type text, 
+						specialization text, 
+						organization text)
+						
+						
+						insert into protocols (id, protocol_number,	protocol_date, protocol_owner, learn_type, specialization, organization) 
+						select id, protocol_number,	protocol_date, protocol_owner, learn_type, specialization, organization from protocols2
+						
+						
+						insert into protocols2 (id, protocol_number,	protocol_date, protocol_owner, learn_type, specialization, organization) 
+						select id, protocol_number,	protocol_date, protocol_owner, learn_type, specialization, organization from protocols
+						
+						
+create table certificates2 (id text primary key,
+							certificate_number integer,
+							certificate_date date,
+							fullname text,
+							birth_date date,
+							protocol_id text);
+							
+							
+						insert into certificates2 (id, certificate_number,	certificate_date, fullname, birth_date, protocol_id) 
+						select id, certificate_number,	certificate_date, fullname, birth_date, protocol_id from certificates
+						
+						insert into certificates (id, certificate_number,	certificate_date, fullname, birth_date, protocol_id) 
+						select id, certificate_number,	certificate_date, fullname, birth_date, protocol_id from certificates2
