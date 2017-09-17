@@ -238,7 +238,7 @@ public class CertificatesTab extends Tab {
 
         HBox hbCertificateNumber = new HBox();
         hbCertificateNumber.setSpacing(10);
-        Label lbCertificateNumber = new Label("Номер сертификата");
+        Label lbCertificateNumber = new Label("Номер удостоверения");
         lbCertificateNumber.setPrefWidth(150);
         hbCertificateNumber.getChildren().addAll(lbCertificateNumber, this.tfCertificateNumber);
         this.tfCertificateNumber.prefWidthProperty().bind(hbCertificateNumber.widthProperty().subtract(lbCertificateNumber.widthProperty()));
@@ -266,7 +266,7 @@ public class CertificatesTab extends Tab {
 
         HBox hbCertificateDate = new HBox();
         hbCertificateDate.setSpacing(10);
-        Label lbCertificateDate = new Label("Дата сертификата");
+        Label lbCertificateDate = new Label("Дата удостоверения");
         lbCertificateDate.setPrefWidth(150);
         hbCertificateDate.getChildren().addAll(lbCertificateDate, this.dpCertificateDate);
         this.dpCertificateDate.prefWidthProperty().bind(hbCertificateDate.widthProperty().subtract(lbCertificateDate.widthProperty()));
@@ -296,7 +296,7 @@ public class CertificatesTab extends Tab {
         String currentYear = String.valueOf(LocalDate.now().getYear());
         this.filters.put("current_year", currentYear);
         this.tfCurrentYear = new TextField(currentYear);
-        this.tfCurrentYear.setPrefWidth(50);
+        this.tfCurrentYear.setMinWidth(20);
         this.tfCurrentYear.setTooltip(new Tooltip("Для смены года нажмите дважды. Потом для завершения нажмите Enter"));
         this.disableCurrentYear();
         this.tfCurrentYear.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -323,7 +323,7 @@ public class CertificatesTab extends Tab {
         this.tfCurrentYear.setStyle("-fx-background-color: #48D1CC; -fx-margin: 0 0 0 100");
 
         this.tfFilterCertificateNumber = new TextField();
-        this.tfFilterCertificateNumber.setPromptText("Номер сертификата");
+        this.tfFilterCertificateNumber.setPromptText("Номер удостоверения");
 
         this.tfFilterCertificateOwner = new TextField();
         this.tfFilterCertificateOwner.setPromptText("ФИО");
@@ -395,6 +395,7 @@ public class CertificatesTab extends Tab {
         });
 
         this.resetFiltersBtn = new Button("Сбросить");
+        this.resetFiltersBtn.setMinWidth(50);
         this.resetFiltersBtn.setOnAction(e -> {
             disableCurrentYear();
 
@@ -421,6 +422,7 @@ public class CertificatesTab extends Tab {
         });
 
         this.filterBtn = new Button("Обновить");
+        this.filterBtn.setMinWidth(50);
         this.filterBtn.setOnAction(e -> {
             disableCurrentYear();
             filters.put("current_year", tfCurrentYear.getText());
@@ -472,7 +474,7 @@ public class CertificatesTab extends Tab {
                 new PropertyValueFactory<ProtocolModel, String>("id"));
         idCol.setVisible(false);
 
-        TableColumn certificateNumber = new TableColumn("Номер сертификата");
+        TableColumn certificateNumber = new TableColumn("Номер удостоверения");
         certificateNumber.setCellValueFactory(
                 new PropertyValueFactory<ProtocolModel, String>("certificateNumber"));
         certificateNumber.setResizable(true);
@@ -534,7 +536,7 @@ public class CertificatesTab extends Tab {
             }
         });
 
-        TableColumn certificateDate = new TableColumn("Дата сертификата");
+        TableColumn certificateDate = new TableColumn("Дата удостоверения");
         certificateDate.setResizable(true);
         certificateDate.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<CertificateModel, String>, ObservableValue<String>>() {
             @Override
@@ -718,7 +720,7 @@ public class CertificatesTab extends Tab {
     }
     
     private void generatePdfFromTableViewAndWriteToFile(File file, TableView certificatesTable) throws IOException, DocumentException {
-        String[] headers = new String[]{"ФИО", "Год рождения", "Организация", "Специальность", "№ протокола", "№ сертификата"};
+        String[] headers = new String[]{ "№ удостоверения", "ФИО", "Год рождения", "Организация", "Специальность", "№ протокола"};
 
         Document document = new Document(PageSize.LETTER.rotate());
 
@@ -728,7 +730,7 @@ public class CertificatesTab extends Tab {
 
             BaseFont bf = BaseFont.createFont(getPdfFontPath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             Font font = new Font(bf, 12, Font.BOLD);
-            Paragraph caption = new Paragraph("Сертификаты за " + filters.get("current_year") + " год", font);
+            Paragraph caption = new Paragraph("Удостоверения за " + filters.get("current_year") + " год", font);
             caption.setAlignment(Element.ALIGN_CENTER);
             document.add(caption);
             document.add(new Paragraph());
@@ -748,6 +750,10 @@ public class CertificatesTab extends Tab {
             certificatesTable.getItems().forEach(item -> {
                 CertificateModel certificate = (CertificateModel) item;
 
+                Phrase phrase6 = new Phrase(certificate.getCertificateNumber()+ " от " 
+                        + LocalDate.parse(certificate.getCertificateDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))
+                        .format(DateTimeFormatter.ofPattern(getUIDateFormat())), fontRow);
+                table.addCell(new PdfPCell(phrase6));
                 Phrase phrase1 = new Phrase(certificate.getCertificateOwner(), fontRow);
                 table.addCell(new PdfPCell(phrase1));
                 Phrase phrase2 = new Phrase(certificate.getCertificateOwnerBirthDate(), fontRow);
@@ -760,10 +766,6 @@ public class CertificatesTab extends Tab {
                         + LocalDate.parse(certificate.getProtocolDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))
                         .format(DateTimeFormatter.ofPattern(getUIDateFormat())), fontRow);
                 table.addCell(new PdfPCell(phrase5));
-                Phrase phrase6 = new Phrase(certificate.getCertificateNumber()+ " от " 
-                        + LocalDate.parse(certificate.getCertificateDate(), DateTimeFormatter.ofPattern(getDBDateFormat()))
-                        .format(DateTimeFormatter.ofPattern(getUIDateFormat())), fontRow);
-                table.addCell(new PdfPCell(phrase6));
 
                 table.completeRow();
             });

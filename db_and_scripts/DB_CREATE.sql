@@ -10,7 +10,7 @@ create table organizations (id text primary key,
 								name text);
 
 create table protocols (id text primary key, 
-						protocol_number text, 
+						protocol_number integer, 
 						protocol_date date, 
 						protocol_owner text, 
 						learn_type text, 
@@ -22,7 +22,7 @@ create table protocols (id text primary key,
 						);
 						
 create table certificates (id text primary key,
-							certificate_number text,
+							certificate_number integer,
 							certificate_date date,
 							fullname text,
 							birth_date date,

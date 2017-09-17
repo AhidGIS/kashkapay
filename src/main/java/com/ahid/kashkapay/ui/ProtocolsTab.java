@@ -326,7 +326,7 @@ public class ProtocolsTab extends Tab {
         this.filters.put("current_year", currentYear);
         this.tfCurrentYear = new TextField(currentYear);
         this.tfCurrentYear.setTooltip(new Tooltip("Для смены года нажмите дважды. Потом для завершения нажмите Enter"));
-        this.tfCurrentYear.setPrefWidth(50);
+        this.tfCurrentYear.setMinWidth(20);
         this.disableCurrentYear();
         this.tfCurrentYear.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -404,6 +404,7 @@ public class ProtocolsTab extends Tab {
         });
 
         this.resetFiltersBtn = new Button("Сбросить");
+        this.resetFiltersBtn.setMinWidth(50);
         this.resetFiltersBtn.setOnAction(e -> {
             disableCurrentYear();
 
@@ -424,6 +425,7 @@ public class ProtocolsTab extends Tab {
         });
 
         this.filterBtn = new Button("Обновить");
+        this.filterBtn.setMinWidth(50);
         this.filterBtn.setOnAction(e -> {
             disableCurrentYear();
             filters.put("current_year", tfCurrentYear.getText());
