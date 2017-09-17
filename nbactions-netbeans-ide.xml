@@ -2,6 +2,7 @@
 <actions>
         <action>
             <actionName>run</actionName>
+            <preAction>build-with-dependencies</preAction>
             <packagings>
                 <packaging>jar</packaging>
             </packagings>
@@ -10,7 +11,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath com.ahid.kashkapay.MainApp jdbc:sqlite:e:/Projects/kashkapay/data.db</exec.args>
+                <exec.args>-classpath %classpath com.ahid.kashkapay.MainApp ./db_and_scripts/data.db e:\arial.ttf</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>E:\Projects\kashkapay\Kashkapay</exec.workingdir>
             </properties>

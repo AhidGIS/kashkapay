@@ -50,6 +50,9 @@ public class Certificate implements Serializable {
     @JoinColumn(name = "protocol_id", referencedColumnName = "id")
     @ManyToOne
     private Protocol protocol;
+    @JoinColumn(name = "organization_id", referencedColumnName = "id")
+    @ManyToOne
+    private Organization organization;
 
     public Certificate() {
     }
@@ -104,6 +107,14 @@ public class Certificate implements Serializable {
 
     public void setProtocol(Protocol protocol) {
         this.protocol = protocol;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     @Override

@@ -73,7 +73,8 @@ public class CertificateModel {
                                     certificate.getBirthDate(), certificate.getProtocol().getId(),
                                     certificate.getProtocol().getProtocolNumber(), certificate.getProtocol().getProtocolDate(),
                                     certificate.getProtocol().getLearnType().getId(), certificate.getProtocol().getLearnType().getName(),
-                                    certificate.getProtocol().getOrganization().getId(), certificate.getProtocol().getOrganization().getName(),
+                                    certificate.getOrganization() == null ? null : certificate.getOrganization().getId(), 
+                                    certificate.getOrganization() == null ? null : certificate.getOrganization().getName(),
                                     certificate.getProtocol().getSpecialization().getId(), certificate.getProtocol().getSpecialization().getName());
     }
 

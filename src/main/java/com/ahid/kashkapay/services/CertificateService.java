@@ -46,17 +46,16 @@ public class CertificateService {
             sqlText += " and protocol_id = '" + filters.get("protocol_id") + "'";
         }
         
+        if (filters.containsKey("organization_id")) {
+            sqlText += " and organization_id = '" + filters.get("organization_id") + "'";
+        }
+        
         boolean isSubqueryNeeded = false;
         String protocolSubquery = "select id from protocols where strftime('%Y', protocol_date) = '" + 
                         filters.get("current_year") + "'";
         
         if (filters.containsKey("learn_type_id")) {
             protocolSubquery += " and learn_type = '" + filters.get("learn_type_id") + "'";
-            isSubqueryNeeded = true;
-        }
-        
-        if (filters.containsKey("organization_id")) {
-            protocolSubquery += " and organization = '" + filters.get("organization_id") + "'";
             isSubqueryNeeded = true;
         }
         

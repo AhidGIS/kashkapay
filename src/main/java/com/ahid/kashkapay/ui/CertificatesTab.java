@@ -109,6 +109,7 @@ public class CertificatesTab extends Tab {
     private TextField tfCertificateOwner;
     private TextField tfCertificateOwnerBirthDate;
     private DatePicker dpCertificateDate;
+    private ComboBox cbOrganization;
     private ComboBox cbProtocol;
 
     private Button filterBtn;
@@ -191,6 +192,26 @@ public class CertificatesTab extends Tab {
                 validate();
             }
         });
+        
+        this.cbOrganization = new ComboBox();
+        this.cbOrganization.setConverter(new StringConverter<Organization>() {
+
+            @Override
+            public String toString(Organization object) {
+                return object.getName();
+            }
+
+            @Override
+            public Organization fromString(String string) {
+                return organizations.stream().filter((Organization item) -> item.getName().equals(string)).findFirst().orElse(null);
+            }
+        });
+        this.cbOrganization.valueProperty().addListener((ObservableValue observable, Object oldValue, Object newValue) -> {
+            if ((newValue == null || !newValue.equals(oldValue)) && certificateForOperate != null) {
+                certificateForOperate.setOrganization((Organization) newValue);
+                validate();
+            }
+        });
 
         this.cbProtocol = new ComboBox();
         this.cbProtocol.setConverter(new StringConverter<Protocol>() {
@@ -263,6 +284,14 @@ public class CertificatesTab extends Tab {
         hbCertificatelOwnerBirthDate.getChildren().addAll(lbCertificateOwnerBirthDate, this.tfCertificateOwnerBirthDate);
         this.tfCertificateOwnerBirthDate.prefWidthProperty().bind(hbCertificatelOwnerBirthDate.widthProperty().subtract(lbCertificateOwnerBirthDate.widthProperty()));
 
+        
+        HBox hbOrganization = new HBox();
+        hbOrganization.setSpacing(10);
+        Label lbOrganization = new Label("Цех (орг.)");
+        lbOrganization.setPrefWidth(150);
+        hbOrganization.getChildren().addAll(lbOrganization, this.cbOrganization);
+        this.cbOrganization.prefWidthProperty().bind(hbOrganization.widthProperty().subtract(lbOrganization.widthProperty()));
+
         HBox hbProtocol = new HBox();
         hbProtocol.setSpacing(10);
         Label lbProtocol = new Label("Протокол");
@@ -281,7 +310,7 @@ public class CertificatesTab extends Tab {
         buttons.setSpacing(10);
         buttons.getChildren().addAll(this.saveBtn, this.cancelBtn);
 
-        editorView.getChildren().addAll(hbCertificateNumber, hbCertificatelOwner, hbCertificatelOwnerBirthDate, hbProtocol, hbCertificateDate, buttons);
+        editorView.getChildren().addAll(hbCertificateNumber, hbCertificatelOwner, hbCertificatelOwnerBirthDate, hbOrganization, hbProtocol, hbCertificateDate, buttons);
         this.setInactiveEditorView();
         return editorView;
     }
@@ -341,6 +370,7 @@ public class CertificatesTab extends Tab {
 
         this.cbFilterLearnType = new ComboBox();
         this.cbFilterLearnType.setPromptText("Вид обучения");
+        this.cbFilterLearnType.setPrefWidth(120);
         this.cbFilterLearnType.setConverter(new StringConverter<LearnType>() {
 
             @Override
@@ -356,6 +386,7 @@ public class CertificatesTab extends Tab {
 
         this.cbFilterOrganization = new ComboBox();
         this.cbFilterOrganization.setPromptText("Цех (орг.)");
+        this.cbFilterOrganization.setPrefWidth(150);
         this.cbFilterOrganization.setConverter(new StringConverter<Organization>() {
 
             @Override
@@ -371,6 +402,7 @@ public class CertificatesTab extends Tab {
 
         this.cbFilterSpecialization = new ComboBox();
         this.cbFilterSpecialization.setPromptText("Профессия");
+        this.cbFilterSpecialization.setPrefWidth(150);
         this.cbFilterSpecialization.setConverter(new StringConverter<Specialization>() {
 
             @Override
@@ -386,6 +418,7 @@ public class CertificatesTab extends Tab {
 
         this.cbFilterProtocol = new ComboBox();
         this.cbFilterProtocol.setPromptText("Протокол");
+        this.cbFilterProtocol.setPrefWidth(100);
         this.cbFilterProtocol.setConverter(new StringConverter<Protocol>() {
             @Override
             public String toString(Protocol object) {
@@ -631,6 +664,7 @@ public class CertificatesTab extends Tab {
         this.tfCertificateNumber.setText(null);
         this.tfCertificateOwner.setText(null);
         this.tfCertificateOwnerBirthDate.setText(null);
+        this.cbOrganization.setValue(null);
         this.cbProtocol.setValue(null);
         this.dpCertificateDate.setValue(null);
     }
@@ -640,6 +674,7 @@ public class CertificatesTab extends Tab {
         this.tfCertificateNumber.setText(String.valueOf(this.certificateForOperate.getCertificateNumber()));
         this.tfCertificateOwner.setText(this.certificateForOperate.getFullname());
         this.tfCertificateOwnerBirthDate.setText(this.certificateForOperate.getBirthDate());
+        this.cbOrganization.setItems(this.organizations);
         this.cbProtocol.setItems(this.protocols);
         this.cbProtocol.setValue(this.certificateForOperate.getProtocol());
         if (this.certificateForOperate.getCertificateDate() != null) {
@@ -699,6 +734,7 @@ public class CertificatesTab extends Tab {
     private void validate() {
         if (this.certificateForOperate.getProtocol() != null && this.certificateForOperate.getProtocol().getId() != null
                 && this.certificateForOperate.getCertificateNumber() != 0
+                && this.certificateForOperate.getOrganization() != null && this.certificateForOperate.getOrganization().getId() != null
                 && this.certificateForOperate.getFullname() != null && !"".equals(this.certificateForOperate.getFullname())
                 && this.certificateForOperate.getCertificateDate() != null && !"".equals(this.certificateForOperate.getCertificateDate())) {
             this.saveBtn.setDisable(false);
