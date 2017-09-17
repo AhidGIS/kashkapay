@@ -6,6 +6,7 @@
 package com.ahid.kashkapay.ui.models;
 
 import com.ahid.kashkapay.entities.Certificate;
+import com.ahid.kashkapay.entities.Organization;
 import com.ahid.kashkapay.entities.Protocol;
 import java.util.Objects;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -64,6 +65,9 @@ public class CertificateModel {
         //protocol.setProtocolNumber(this.getProtocolNumber());
         //protocol.setProtocolDate(this.getProtocolDate());
         certificate.setProtocol(protocol);
+        Organization organization = new Organization();
+        organization.setId(this.getOrgId());
+        certificate.setOrganization(organization);
         return certificate;
     }
      
